@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const LUT_SIZE = 1000;
 
@@ -13,6 +13,7 @@ interface PathData {
 }
 
 export default function HeroContours() {
+  const [ready, setReady] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathsRef = useRef<PathData[]>([]);
   const targetPhaseRef = useRef(0);
@@ -182,9 +183,10 @@ export default function HeroContours() {
       updateDots(0);
 
 
-      // 7. Apply CSS scale transform
+      // 7. Apply CSS scale transform and reveal animated layer
       svgEl.style.transform = "scale(1.1)";
       svgEl.style.transformOrigin = "center center";
+      setReady(true);
 
       // 8. Lerp frame — only runs when scheduled, stops when settled
       function tick() {
@@ -255,20 +257,45 @@ export default function HeroContours() {
   }, []);
 
   return (
-    <svg
-      ref={svgRef}
-      viewBox="0 0 1200 849"
-      preserveAspectRatio="xMidYMax slice"
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 10,
-        opacity: 0.8,
-      }}
-    />
+    <>
+      {/* Static fallback — visible immediately, hidden once animated version is ready */}
+      {!ready && (
+        <img
+          src="/images/contours-dark.svg"
+          alt=""
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center bottom",
+            pointerEvents: "none",
+            zIndex: 10,
+            opacity: 0.8,
+            filter: "brightness(0) invert(1)",
+            transform: "scale(1.1)",
+            transformOrigin: "center center",
+          }}
+        />
+      )}
+      {/* Animated SVG — circles added imperatively by useEffect */}
+      <svg
+        ref={svgRef}
+        viewBox="0 0 1200 849"
+        preserveAspectRatio="xMidYMax slice"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 10,
+          opacity: ready ? 0.8 : 0,
+        }}
+      />
+    </>
   );
 }

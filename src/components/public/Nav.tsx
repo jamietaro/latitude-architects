@@ -70,6 +70,8 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
           right: 0,
           height: 60,
           zIndex: 100,
+          backgroundColor: isTransparentMode ? 'transparent' : 'rgb(255,255,255)',
+          borderBottom: isTransparentMode ? 'none' : '1px solid rgb(232,230,226)',
         }}
       >
         <div
