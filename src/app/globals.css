@@ -32,6 +32,19 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Nav initial state — prevents black line / dark text flash before hydration */
+nav.site-nav-transparent {
+  background-color: transparent !important;
+  border-bottom: 1px solid transparent !important;
+  color: white !important;
+}
+
+nav.site-nav-transparent[data-scrolled="true"] {
+  background-color: rgb(255, 255, 255) !important;
+  border-bottom-color: rgb(232, 230, 226) !important;
+  color: rgb(17, 17, 17) !important;
+}
+
 /* Rich text content styles */
 .prose-content h2 {
   font-size: 18px;
