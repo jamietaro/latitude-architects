@@ -42,6 +42,20 @@ export default function ClientsPage() {
       <div style={{ paddingTop: 60 }}>
         <PracticeSubNav />
 
+        <p
+          style={{
+            maxWidth: 680,
+            margin: '0 auto',
+            padding: '0 40px',
+            fontSize: 22,
+            fontWeight: 300,
+            color: '#111111',
+            marginBottom: 40,
+          }}
+        >
+          25 years of strong client relationships.
+        </p>
+
         <div
           className="clients-grid"
           style={{
