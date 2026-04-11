@@ -93,7 +93,7 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
                   alt="Latitude Architects"
                   width={200}
                   height={32}
-                  className="nav-logo nav-logo-white"
+                  className="nav-logo nav-logo-white no-fade"
                   priority
                 />
                 <Image
@@ -101,7 +101,7 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
                   alt="Latitude Architects"
                   width={200}
                   height={32}
-                  className="nav-logo nav-logo-dark"
+                  className="nav-logo nav-logo-dark no-fade"
                   priority
                 />
               </>
@@ -111,6 +111,7 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
                 alt="Latitude Architects"
                 width={200}
                 height={32}
+                className="no-fade"
                 style={{ height: 32, width: 'auto' }}
                 priority
               />

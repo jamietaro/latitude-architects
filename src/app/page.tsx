@@ -5,6 +5,7 @@ import Footer from '@/components/public/Footer';
 import ScrollFadeIn from '@/components/public/ScrollFadeIn';
 import HeroContours from '@/components/public/HeroContours';
 import HeroCaption from '@/components/public/HeroCaption';
+import FadeImage from '@/components/public/FadeImage';
 import { prisma } from '@/lib/prisma';
 
 export default async function HomePage() {
@@ -13,7 +14,7 @@ export default async function HomePage() {
       where: { published: true, featured: true },
       orderBy: { order: 'asc' },
       include: { images: { orderBy: { order: 'asc' } } },
-      take: 8,
+      take: 9,
     }),
     prisma.newsPost.findMany({
       where: { published: true },
@@ -42,7 +43,7 @@ export default async function HomePage() {
             width={1920}
             height={1080}
             priority
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover no-fade"
             style={{ opacity: heroOpacity }}
           />
         ) : (
@@ -58,6 +59,7 @@ export default async function HomePage() {
             alt="Latitude Architects"
             width={300}
             height={84}
+            className="no-fade"
             style={{ width: 300, height: 'auto', pointerEvents: 'auto' }}
             priority
           />
@@ -146,7 +148,7 @@ export default async function HomePage() {
             className="featured-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '48px 32px',
             }}
           >
@@ -159,7 +161,7 @@ export default async function HomePage() {
                     className="block no-underline featured-link"
                   >
                     {img ? (
-                      <Image
+                      <FadeImage
                         src={img.url}
                         alt={img.alt ?? project.title}
                         width={1200}

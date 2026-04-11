@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import FadeImage from '@/components/public/FadeImage';
 import { notFound } from 'next/navigation';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
@@ -62,7 +62,7 @@ export default async function JournalPostPage({
           </p>
 
           {post.image && (
-            <Image
+            <FadeImage
               src={post.image}
               alt={post.title}
               width={1360}

@@ -21,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={dmSans.className}>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen public-site">
+        <div className="page-transition">{children}</div>
+      </body>
     </html>
   );
 }

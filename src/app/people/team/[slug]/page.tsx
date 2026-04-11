@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import FadeImage from '@/components/public/FadeImage';
 import { notFound } from 'next/navigation';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
@@ -23,7 +23,7 @@ export default async function TeamMemberPage({
       <div style={{ paddingTop: 60 }}>
         <div style={{ maxWidth: 680, margin: '0 auto', marginTop: 80, padding: '0 40px 80px' }}>
           {member.photo ? (
-            <Image
+            <FadeImage
               src={member.photo}
               alt={member.name}
               width={640}

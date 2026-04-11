@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import FadeImage from '@/components/public/FadeImage';
 import Link from 'next/link';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
@@ -83,7 +83,7 @@ export default async function TeamPage() {
               className="no-underline block team-member-link"
             >
               {member.photo ? (
-                <Image
+                <FadeImage
                   src={member.photo}
                   alt={member.name}
                   width={600}

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import FadeImage from "@/components/public/FadeImage";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
 import PracticeSubNav from "@/components/public/PracticeSubNav";
@@ -118,7 +118,7 @@ export default async function ContactPage() {
           {/* Right: Image from CMS */}
           <div>
             {contactImage && (
-              <Image
+              <FadeImage
                 src={contactImage}
                 alt="Latitude Architects"
                 width={600}

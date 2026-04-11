@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
+import FadeImage from "@/components/public/FadeImage";
 import { prisma } from "@/lib/prisma";
 
 export default async function ProjectDetailPage({
@@ -87,7 +87,7 @@ export default async function ProjectDetailPage({
             >
               {project.images.map(
                 (img: (typeof project.images)[number]) => (
-                  <Image
+                  <FadeImage
                     key={img.id}
                     src={img.url}
                     alt={img.alt ?? project.title}

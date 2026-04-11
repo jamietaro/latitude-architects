@@ -45,6 +45,26 @@ nav.site-nav-transparent[data-scrolled="true"] {
   color: rgb(17, 17, 17) !important;
 }
 
+/* Page fade-in transition */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page-transition {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Public site image fade-in on load */
+.public-site img:not(.no-fade) {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.public-site img.loaded {
+  opacity: 1;
+}
+
 /* Rich text content styles */
 .prose-content h2 {
   font-size: 18px;

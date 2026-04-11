@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import FadeImage from '@/components/public/FadeImage';
 import Link from 'next/link';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
@@ -69,7 +69,7 @@ export default async function JournalPage() {
                   style={{ transition: 'opacity 0.25s ease' }}
                 >
                   {post.image && (
-                    <Image
+                    <FadeImage
                       src={post.image}
                       alt={post.title}
                       width={1200}

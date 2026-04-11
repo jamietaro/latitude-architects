@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import FadeImage from '@/components/public/FadeImage';
 import ScrollFadeIn from '@/components/public/ScrollFadeIn';
 
 const SECTORS = [
@@ -100,7 +100,7 @@ export default function ProjectsGrid({
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
                 >
                   {img ? (
-                    <Image
+                    <FadeImage
                       src={img.url}
                       alt={img.alt ?? project.title}
                       width={1200}
