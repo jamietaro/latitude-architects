@@ -27,6 +27,9 @@ export default async function HomePage() {
   ]);
   const heroImage = siteSettings?.heroImageUrl ?? null;
   const heroOpacity = siteSettings?.heroImageOpacity ?? 1.0;
+  const bannerImageUrl = siteSettings?.bannerImageUrl ?? null;
+  const bannerTagline = siteSettings?.bannerTagline ?? "Buildings for people.";
+  const bannerCta = siteSettings?.bannerCta ?? "Get in touch";
 
   const heroProject = featuredProjects[0] ?? null;
 
@@ -260,9 +263,60 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* Banner */}
+      <section
+        style={{
+          width: '100%',
+          height: '33vh',
+          backgroundImage: bannerImageUrl ? `url(${bannerImageUrl})` : 'none',
+          backgroundColor: bannerImageUrl ? undefined : '#1a1a1a',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 16,
+        }}
+      >
+        <p
+          style={{
+            fontSize: 32,
+            fontWeight: 300,
+            color: '#ffffff',
+            letterSpacing: '0.02em',
+            margin: 0,
+            textAlign: 'center',
+            padding: '0 40px',
+          }}
+        >
+          {bannerTagline}
+        </p>
+        <Link
+          href="/practice/contact"
+          className="banner-cta"
+          style={{
+            fontSize: 13,
+            fontWeight: 300,
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            textDecoration: 'none',
+            paddingBottom: 2,
+            borderBottom: '1px solid transparent',
+            transition: 'border-bottom-color 0.25s ease',
+          }}
+        >
+          {bannerCta}
+        </Link>
+      </section>
+
       <Footer />
 
       <style>{`
+        .banner-cta:hover {
+          border-bottom-color: #ffffff !important;
+        }
         .featured-link {
           transition: opacity 0.25s ease;
         }

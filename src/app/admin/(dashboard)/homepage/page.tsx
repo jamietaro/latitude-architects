@@ -7,6 +7,9 @@ export default function HomepagePage() {
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
   const [heroImageOpacity, setHeroImageOpacity] = useState(1.0);
   const [contactImageUrl, setContactImageUrl] = useState<string | null>(null);
+  const [bannerImageUrl, setBannerImageUrl] = useState<string | null>(null);
+  const [bannerTagline, setBannerTagline] = useState("Buildings for people.");
+  const [bannerCta, setBannerCta] = useState("Get in touch");
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [loaded, setLoaded] = useState(false);
@@ -18,6 +21,9 @@ export default function HomepagePage() {
       setHeroImageUrl(data.heroImageUrl ?? null);
       setHeroImageOpacity(data.heroImageOpacity ?? 1.0);
       setContactImageUrl(data.contactImageUrl ?? null);
+      setBannerImageUrl(data.bannerImageUrl ?? null);
+      setBannerTagline(data.bannerTagline ?? "Buildings for people.");
+      setBannerCta(data.bannerCta ?? "Get in touch");
     }
     setLoaded(true);
   }, []);
@@ -33,7 +39,7 @@ export default function HomepagePage() {
       const res = await fetch("/api/admin/homepage", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroImageUrl, heroImageOpacity, contactImageUrl }),
+        body: JSON.stringify({ heroImageUrl, heroImageOpacity, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta }),
       });
       if (res.ok) {
         setSaveStatus("Saved");
@@ -97,6 +103,33 @@ export default function HomepagePage() {
             Image displayed on the Practice &gt; Contact page
           </p>
           <ImageUpload value={contactImageUrl} onChange={setContactImageUrl} />
+        </div>
+
+        <div className="max-w-[480px] pt-8 border-t border-[#2a2a2e]">
+          <label className={labelClass}>Banner Image</label>
+          <p className="text-[#666] text-xs mb-2">
+            Background image for the banner section on the homepage
+          </p>
+          <ImageUpload value={bannerImageUrl} onChange={setBannerImageUrl} />
+          <div className="mt-4">
+            <label className={labelClass}>Banner Tagline</label>
+            <input
+              type="text"
+              value={bannerTagline}
+              onChange={(e) => setBannerTagline(e.target.value)}
+              className="bg-[#28282c] border border-[#444] text-white text-sm h-11 px-3 w-full rounded outline-none focus:border-[#666] transition-colors"
+            />
+          </div>
+          <div className="mt-4">
+            <label className={labelClass}>Banner CTA Label</label>
+            <input
+              type="text"
+              value={bannerCta}
+              onChange={(e) => setBannerCta(e.target.value)}
+              className="bg-[#28282c] border border-[#444] text-white text-sm h-11 px-3 w-full rounded outline-none focus:border-[#666] transition-colors"
+            />
+            <p className="text-[#666] text-xs mt-1">Links to /practice/contact</p>
+          </div>
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ export async function GET() {
 
   const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
   return NextResponse.json(
-    settings ?? { id: 1, heroImageUrl: null, heroImageOpacity: 1.0, contactImageUrl: null }
+    settings ?? { id: 1, heroImageUrl: null, heroImageOpacity: 1.0, contactImageUrl: null, bannerImageUrl: null, bannerTagline: "Buildings for people.", bannerCta: "Get in touch" }
   );
 }
 
@@ -19,7 +19,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { heroImageUrl, heroImageOpacity, contactImageUrl } = body;
+  const { heroImageUrl, heroImageOpacity, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta } = body;
 
   const settings = await prisma.siteSettings.upsert({
     where: { id: 1 },
@@ -27,12 +27,18 @@ export async function PUT(request: Request) {
       heroImageUrl: heroImageUrl || null,
       heroImageOpacity: heroImageOpacity ?? 1.0,
       contactImageUrl: contactImageUrl || null,
+      bannerImageUrl: bannerImageUrl || null,
+      bannerTagline: bannerTagline ?? "Buildings for people.",
+      bannerCta: bannerCta ?? "Get in touch",
     },
     create: {
       id: 1,
       heroImageUrl: heroImageUrl || null,
       heroImageOpacity: heroImageOpacity ?? 1.0,
       contactImageUrl: contactImageUrl || null,
+      bannerImageUrl: bannerImageUrl || null,
+      bannerTagline: bannerTagline ?? "Buildings for people.",
+      bannerCta: bannerCta ?? "Get in touch",
     },
   });
 
