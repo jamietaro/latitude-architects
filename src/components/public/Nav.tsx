@@ -21,25 +21,27 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
-  const prevScrolledRef = useRef(false);
 
   useEffect(() => {
     if (!transparent) return;
     const nav = navRef.current;
     if (!nav) return;
 
-    function onScroll() {
-      const y = window.scrollY;
-      const wasScrolled = prevScrolledRef.current;
-      const scrolled = wasScrolled ? y > 60 : y > 80;
-      if (scrolled === wasScrolled) return;
-      prevScrolledRef.current = scrolled;
-      nav!.dataset.scrolled = scrolled ? 'true' : 'false';
-    }
+    // Find the hero section — the first section child of main
+    const hero = document.querySelector('section.h-screen');
+    if (!hero) return;
 
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Hero intersecting = nav over hero = transparent
+        // Hero not intersecting = nav over page content = solid
+        nav.dataset.scrolled = entry.isIntersecting ? 'false' : 'true';
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(hero);
+    return () => observer.disconnect();
   }, [transparent]);
 
   useEffect(() => {
