@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: #111111;
+  --color-secondary: #999999;
+  --color-border: #e8e6e2;
+  --color-background: #ffffff;
+  --color-foreground: #111111;
+  --font-sans: "DM Sans", sans-serif;
+  --max-width-content: 1280px;
+  --max-width-prose: 680px;
+  --max-width-image: 600px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+.admin-toggle {
+  border-radius: 9999px !important;
+}
+
+.admin-toggle::after {
+  border-radius: 9999px !important;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+/* Rich text content styles */
+.prose-content h2 {
+  font-size: 18px;
+  font-weight: 300;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: #111;
+}
+
+.prose-content h3 {
+  font-size: 16px;
+  font-weight: 400;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: #111;
+}
+
+.prose-content p {
+  margin-bottom: 16px;
+}
+
+.prose-content ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+
+.prose-content li {
+  margin-bottom: 4px;
+}
+
+.prose-content a {
+  color: #111;
+  text-decoration: underline;
+}
+
+.prose-content a:hover {
+  opacity: 0.6;
+}
+
+/* Tiptap editor styles for admin */
+.tiptap-editor .ProseMirror {
+  min-height: 200px;
+  outline: none;
+  padding: 12px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  color: #666;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap-editor .ProseMirror h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.tiptap-editor .ProseMirror h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.tiptap-editor .ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.tiptap-editor .ProseMirror a {
+  color: #60a5fa;
+  text-decoration: underline;
 }
