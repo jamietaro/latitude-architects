@@ -34,6 +34,7 @@ export default function HeroContours() {
       initialised = true;
       const svgEl = svg; // non-null alias for closures
 
+
       // 1. Parse the SVG string to extract paths and dots
       const parser = new DOMParser();
       const doc = parser.parseFromString(svgContent, "image/svg+xml");
@@ -59,6 +60,8 @@ export default function HeroContours() {
         dotPositions.push({ cx, cy });
       });
 
+
+
       // 2. Create invisible measurement paths in our SVG
       const ns = "http://www.w3.org/2000/svg";
       const pathDataArr: PathData[] = [];
@@ -72,7 +75,6 @@ export default function HeroContours() {
         svgEl.appendChild(measPath);
 
         const totalLength = measPath.getTotalLength();
-        console.log(`HeroContours path ${i}: totalLength = ${totalLength.toFixed(1)}`);
 
         // Pre-compute lookup table for this path
         const lut = new Float32Array(LUT_SIZE * 2);
@@ -90,6 +92,7 @@ export default function HeroContours() {
           dots: [],
         });
       });
+
 
       // 3. Sample each path and assign dots to nearest path
       const SAMPLES = 200;
@@ -118,43 +121,30 @@ export default function HeroContours() {
         dotAssignments[di] = bestPath;
       });
 
-      // 4. Compute each dot's baseOffset on its assigned path (ternary search)
+
+
+      // 4. Compute each dot's baseOffset from its x position relative to the path's x-span
+      const pathXRanges = pathDataArr.map((pd) => {
+        let minX = Infinity, maxX = -Infinity;
+        for (let j = 0; j < LUT_SIZE; j++) {
+          const x = pd.lut[j * 2];
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+        }
+        return { minX, maxX };
+      });
+
       dotPositions.forEach((dot, di) => {
         const pi = dotAssignments[di];
         const pd = pathDataArr[pi];
-        const len = pd.totalLength;
+        const { minX, maxX } = pathXRanges[pi];
+        const span = maxX - minX;
+        const baseOffset = span > 0 ? (dot.cx - minX) / span : 0;
 
-        // Coarse search
-        let bestT = 0;
-        let bestDist = Infinity;
-        const COARSE = 100;
-        for (let i = 0; i <= COARSE; i++) {
-          const t = i / COARSE;
-          const pt = pd.el!.getPointAtLength(t * len);
-          const dist = (dot.cx - pt.x) ** 2 + (dot.cy - pt.y) ** 2;
-          if (dist < bestDist) {
-            bestDist = dist;
-            bestT = t;
-          }
-        }
-
-        // Fine ternary search
-        let lo = Math.max(0, bestT - 1 / COARSE);
-        let hi = Math.min(1, bestT + 1 / COARSE);
-        for (let iter = 0; iter < 10; iter++) {
-          const mid1 = lo + (hi - lo) / 3;
-          const mid2 = hi - (hi - lo) / 3;
-          const pt1 = pd.el!.getPointAtLength(mid1 * len);
-          const pt2 = pd.el!.getPointAtLength(mid2 * len);
-          const d1 = (dot.cx - pt1.x) ** 2 + (dot.cy - pt1.y) ** 2;
-          const d2 = (dot.cx - pt2.x) ** 2 + (dot.cy - pt2.y) ** 2;
-          if (d1 < d2) hi = mid2;
-          else lo = mid1;
-        }
-        const baseOffset = (lo + hi) / 2;
-
-        pd.dots.push({ baseOffset, circleEl: null });
+        pd.dots.push({ baseOffset: Math.max(0, Math.min(1, baseOffset)), circleEl: null });
       });
+
+
 
       // 5. Create circle elements for each dot
       pathDataArr.forEach((pd) => {
@@ -190,6 +180,7 @@ export default function HeroContours() {
       }
 
       updateDots(0);
+
 
       // 7. Apply CSS scale transform
       svgEl.style.transform = "scale(1.1)";
