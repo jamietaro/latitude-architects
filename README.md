@@ -8,7 +8,7 @@ Website and CMS for Latitude Architects and Designers Ltd, a RIBA Chartered arch
 - **Supabase** (hosted PostgreSQL database)
 - **Prisma 7** (ORM with pg adapter)
 - **NextAuth v5** (authentication, JWT sessions)
-- **Cloudinary** (image hosting and delivery)
+- **Supabase Storage** (image hosting and delivery)
 - **Tailwind CSS v4** (styling)
 - **DM Sans** (typography via next/font)
 - **Tiptap** (rich text editor for CMS)
@@ -33,9 +33,8 @@ DATABASE_URL="your-supabase-pooled-connection-string"
 DIRECT_URL="your-supabase-direct-connection-string"
 NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
 NEXTAUTH_URL="http://localhost:3000"
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your-cloud-name"
-CLOUDINARY_API_KEY="your-api-key"
-CLOUDINARY_API_SECRET="your-api-secret"
+NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 ```
 
 Also update the `.env` file with the same `DATABASE_URL` and `DIRECT_URL` values (Prisma CLI reads from `.env`).
@@ -74,14 +73,28 @@ Visit `http://localhost:3000` for the public site and `http://localhost:3000/adm
 4. Copy the **Direct connection** string — this is your `DIRECT_URL`
 5. Paste both into `.env.local` and `.env`
 
-## Cloudinary Setup
+## Supabase Storage Setup
 
-1. Create a free account at [cloudinary.com](https://cloudinary.com)
-2. From the dashboard, copy:
-   - **Cloud name** → `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
-   - **API Key** → `CLOUDINARY_API_KEY`
-   - **API Secret** → `CLOUDINARY_API_SECRET`
+1. In your Supabase project, go to **Storage** and create a public bucket called `media`
+2. Go to **Settings > API** and copy:
+   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+   - **service_role key** (under Project API keys) → `SUPABASE_SERVICE_ROLE_KEY`
 3. Paste into `.env.local`
+
+## Supabase Storage CORS
+
+The Supabase `media` bucket must allow requests from your app's origin. In your Supabase project, go to **Storage > Policies** and set the CORS configuration on the `media` bucket:
+
+```json
+{
+  "AllowedOrigins": ["http://localhost:3000", "https://your-production-domain.com"],
+  "AllowedMethods": ["GET", "POST", "PUT", "DELETE"],
+  "AllowedHeaders": ["*"],
+  "MaxAgeSeconds": 3600
+}
+```
+
+Replace `https://your-production-domain.com` with your actual production URL once deployed.
 
 ## CMS Usage
 

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
 const navItems = [
+  { label: "Homepage", href: "/admin/homepage" },
   { label: "Projects", href: "/admin/projects" },
   { label: "News", href: "/admin/news" },
   { label: "Team", href: "/admin/team" },

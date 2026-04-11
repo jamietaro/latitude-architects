@@ -3,53 +3,72 @@ import Link from 'next/link';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import ScrollFadeIn from '@/components/public/ScrollFadeIn';
+import HeroContours from '@/components/public/HeroContours';
+import HeroCaption from '@/components/public/HeroCaption';
 import { prisma } from '@/lib/prisma';
 
 export default async function HomePage() {
-  const featuredProjects = await prisma.project.findMany({
-    where: { published: true, featured: true },
-    orderBy: { order: 'asc' },
-    include: { images: { orderBy: { order: 'asc' } } },
-  });
-
-  const recentNews = await prisma.newsPost.findMany({
-    where: { published: true },
-    orderBy: { date: 'desc' },
-    take: 2,
-  });
+  const [featuredProjects, recentNews, siteSettings] = await Promise.all([
+    prisma.project.findMany({
+      where: { published: true, featured: true },
+      orderBy: { order: 'asc' },
+      include: { images: { orderBy: { order: 'asc' } } },
+      take: 8,
+    }),
+    prisma.newsPost.findMany({
+      where: { published: true },
+      orderBy: { date: 'desc' },
+      take: 2,
+    }),
+    prisma.siteSettings.findUnique({
+      where: { id: 1 },
+    }),
+  ]);
+  const heroImage = siteSettings?.heroImageUrl ?? null;
+  const heroOpacity = siteSettings?.heroImageOpacity ?? 1.0;
 
   const heroProject = featuredProjects[0] ?? null;
-  const remainingProjects = featuredProjects.slice(1);
-  const heroImage = heroProject?.images?.[0]?.url ?? null;
 
   return (
     <main>
-      <Nav transparent={true} />
+      <Nav transparent={true} darkBackground={!!heroImage} />
 
       {/* Hero Section */}
       <section className="relative h-screen w-full overflow-hidden">
         {heroImage ? (
           <Image
             src={heroImage}
-            alt={heroProject?.title ?? ''}
+            alt=""
             width={1920}
             height={1080}
             priority
             className="absolute inset-0 h-full w-full object-cover"
+            style={{ opacity: heroOpacity }}
           />
         ) : (
-          <div className="absolute inset-0 bg-gray-200" />
+          <div className="absolute inset-0 bg-white" />
         )}
-        <div className="absolute inset-0 bg-black/20" />
+        {heroImage && <div className="absolute inset-0 bg-black/20" />}
 
-        <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center">
+        <HeroContours />
+
+        <HeroCaption>
+          <Image
+            src="/images/logo-white.png"
+            alt="Latitude Architects"
+            width={300}
+            height={84}
+            style={{ width: 300, height: 'auto', pointerEvents: 'auto' }}
+            priority
+          />
+          <div style={{ height: 24 }} />
           {heroProject && (
-            <Link href={`/projects/${heroProject.slug}`} className="text-center no-underline">
+            <Link href={`/projects/${heroProject.slug}`} className="text-center no-underline" style={{ pointerEvents: 'auto' }}>
               <p
                 style={{
                   fontSize: 15,
                   fontWeight: 300,
-                  color: '#ffffff',
+                  color: heroImage ? '#ffffff' : '#111111',
                   margin: 0,
                 }}
               >
@@ -59,23 +78,23 @@ export default async function HomePage() {
                 style={{
                   fontSize: 13,
                   fontWeight: 300,
-                  color: 'rgba(255,255,255,0.7)',
+                  color: heroImage ? 'rgba(255,255,255,0.7)' : '#999999',
                   margin: '4px 0 0',
                 }}
               >
-                {heroProject.sectors}
+                {heroProject.sectors.split(',').join(' \u00b7 ')}
               </p>
             </Link>
           )}
+          <div style={{ height: 32 }} />
           <p
             style={{
               fontSize: 10,
               fontWeight: 300,
               textTransform: 'uppercase',
               letterSpacing: '0.15em',
-              color: 'rgba(255,255,255,0.6)',
-              marginTop: 24,
-              marginBottom: 8,
+              color: heroImage ? 'rgba(255,255,255,0.6)' : '#999999',
+              margin: 0,
             }}
           >
             SCROLL
@@ -84,50 +103,79 @@ export default async function HomePage() {
             style={{
               width: 1,
               height: 24,
-              backgroundColor: 'rgba(255,255,255,0.6)',
+              backgroundColor: heroImage ? 'rgba(255,255,255,0.6)' : '#cccccc',
+              marginTop: 8,
             }}
           />
-        </div>
+        </HeroCaption>
       </section>
 
-      {/* Featured Projects */}
-      {remainingProjects.length > 0 && (
+      {/* Projects Header */}
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: '0 auto',
+          padding: '64px 40px 48px',
+          textAlign: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontSize: 12,
+            fontWeight: 400,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: '#111111',
+            margin: 0,
+          }}
+        >
+          PROJECTS
+        </p>
+      </div>
+
+      {/* Featured Projects Grid */}
+      {featuredProjects.length > 0 && (
         <section
           style={{
             maxWidth: 1280,
             margin: '0 auto',
-            padding: '80px 40px',
+            padding: '0 40px 80px',
           }}
         >
-          <div className="flex flex-col items-center" style={{ gap: 48 }}>
-            {remainingProjects.map((project: typeof featuredProjects[number]) => {
+          <div
+            className="featured-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '48px 32px',
+            }}
+          >
+            {featuredProjects.map((project: typeof featuredProjects[number]) => {
               const img = project.images?.[0];
               return (
                 <ScrollFadeIn key={project.id}>
                   <Link
                     href={`/projects/${project.slug}`}
-                    className="block text-center no-underline featured-link"
+                    className="block no-underline featured-link"
                   >
-                    <div style={{ maxWidth: 600, margin: '0 auto' }}>
-                      {img ? (
-                        <Image
-                          src={img.url}
-                          alt={img.alt ?? project.title}
-                          width={1200}
-                          height={800}
-                          loading="lazy"
-                          style={{ width: '100%', height: 'auto' }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: '100%',
-                            aspectRatio: '3/2',
-                            backgroundColor: '#f3f3f3',
-                          }}
-                        />
-                      )}
-                    </div>
+                    {img ? (
+                      <Image
+                        src={img.url}
+                        alt={img.alt ?? project.title}
+                        width={1200}
+                        height={800}
+                        loading="lazy"
+                        style={{ width: '100%', height: 'auto' }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '100%',
+                          aspectRatio: '3/2',
+                          backgroundColor: '#f3f3f3',
+                        }}
+                      />
+                    )}
                     <p
                       style={{
                         fontSize: 14,
@@ -146,7 +194,7 @@ export default async function HomePage() {
                         margin: '2px 0 0',
                       }}
                     >
-                      {project.sectors}
+                      {project.sectors.split(',').join(' \u00b7 ')}
                     </p>
                   </Link>
                 </ScrollFadeIn>
@@ -218,6 +266,11 @@ export default async function HomePage() {
         }
         .featured-link:hover {
           opacity: 0.75;
+        }
+        @media (max-width: 767px) {
+          .featured-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
         }
       `}</style>
     </main>

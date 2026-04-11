@@ -29,6 +29,7 @@ export default function TiptapEditor({
       Placeholder.configure({ placeholder }),
     ],
     content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },

@@ -64,3 +64,11 @@ model AdminUser {
   passwordHash String
   createdAt    DateTime @default(now())
 }
+
+model SiteSettings {
+  id               Int      @id @default(1)
+  heroImageUrl     String?
+  heroImageOpacity Float?   @default(1.0)
+  contactImageUrl  String?
+  updatedAt        DateTime @updatedAt
+}

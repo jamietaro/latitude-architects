@@ -2,78 +2,67 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 interface NavProps {
   transparent?: boolean;
+  darkBackground?: boolean;
 }
 
 const navLinks = [
   { label: 'Projects', href: '/projects' },
-  { label: 'People', href: '/people', dropdown: [{ label: 'Team', href: '/people/team' }] },
-  {
-    label: 'Practice',
-    href: '/practice',
-    dropdown: [
-      { label: 'About', href: '/practice' },
-      { label: 'Clients', href: '/practice/clients' },
-      { label: 'Awards', href: '/practice/awards' },
-      { label: 'Contact', href: '/practice/contact' },
-    ],
-  },
+  { label: 'People', href: '/people/team' },
+  { label: 'Practice', href: '/practice' },
   { label: 'Journal', href: '/journal' },
 ];
 
-export default function Nav({ transparent = false }: NavProps) {
+export default function Nav({ transparent = false, darkBackground = false }: NavProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const prevScrolledRef = useRef(false);
 
   useEffect(() => {
     if (!transparent) return;
-    const handleScroll = () => setScrolled(window.scrollY > 10);
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const nav = navRef.current;
+    if (!nav) return;
+
+    function onScroll() {
+      const y = window.scrollY;
+      const wasScrolled = prevScrolledRef.current;
+      const scrolled = wasScrolled ? y > 60 : y > 80;
+      if (scrolled === wasScrolled) return;
+      prevScrolledRef.current = scrolled;
+      nav!.dataset.scrolled = scrolled ? 'true' : 'false';
+    }
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, [transparent]);
 
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
-  const isTransparentMode = transparent && !scrolled && !mobileOpen;
-  const textColor = isTransparentMode ? '#ffffff' : '#111111';
-  const inactiveColor = isTransparentMode ? 'rgba(255,255,255,0.65)' : '#999999';
-  const bgColor = isTransparentMode ? 'transparent' : '#ffffff';
-  const borderColor = isTransparentMode ? 'transparent' : '#e8e6e2';
+  const isTransparentMode = transparent && !mobileOpen;
+  const showDualLogos = isTransparentMode && darkBackground;
 
   const isActive = (href: string) => {
     if (href === '/projects') return pathname.startsWith('/projects');
-    if (href === '/people') return pathname.startsWith('/people');
+    if (href === '/people/team') return pathname.startsWith('/people');
     if (href === '/practice') return pathname.startsWith('/practice');
     if (href === '/journal') return pathname.startsWith('/journal');
     return pathname === href;
   };
 
-  const handleDropdownEnter = (label: string) => {
-    if (dropdownTimeoutRef.current) {
-      clearTimeout(dropdownTimeoutRef.current);
-      dropdownTimeoutRef.current = null;
-    }
-    setOpenDropdown(label);
-  };
-
-  const handleDropdownLeave = () => {
-    dropdownTimeoutRef.current = setTimeout(() => {
-      setOpenDropdown(null);
-    }, 150);
-  };
-
   return (
     <>
       <nav
+        ref={navRef}
+        className={isTransparentMode ? 'site-nav site-nav-transparent' : 'site-nav site-nav-solid'}
+        data-scrolled="false"
         style={{
           position: 'fixed',
           top: 0,
@@ -81,9 +70,6 @@ export default function Nav({ transparent = false }: NavProps) {
           right: 0,
           height: 60,
           zIndex: 100,
-          backgroundColor: bgColor,
-          borderBottom: `1px solid ${borderColor}`,
-          transition: 'background-color 0.25s ease, border-color 0.25s ease',
         }}
       >
         <div
@@ -97,122 +83,64 @@ export default function Nav({ transparent = false }: NavProps) {
             justifyContent: 'space-between',
           }}
         >
-          <Link
-            href="/"
-            style={{
-              fontSize: 15,
-              fontWeight: 300,
-              textTransform: 'lowercase',
-              letterSpacing: '0.02em',
-              color: textColor,
-              textDecoration: 'none',
-              transition: 'opacity 0.25s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.6')}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-          >
-            latitude architects
+          <Link href="/" className="nav-logo-link">
+            {showDualLogos ? (
+              <>
+                <Image
+                  src="/images/logo-white.png"
+                  alt="Latitude Architects"
+                  width={200}
+                  height={32}
+                  className="nav-logo nav-logo-white"
+                  priority
+                />
+                <Image
+                  src="/images/logo-dark.png"
+                  alt="Latitude Architects"
+                  width={200}
+                  height={32}
+                  className="nav-logo nav-logo-dark"
+                  priority
+                />
+              </>
+            ) : (
+              <Image
+                src="/images/logo-dark.png"
+                alt="Latitude Architects"
+                width={200}
+                height={32}
+                style={{ height: 32, width: 'auto' }}
+                priority
+              />
+            )}
           </Link>
 
-          {/* Desktop nav */}
-          <div
-            className="nav-desktop"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 60,
-            }}
-          >
+          <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 60 }}>
             {navLinks.map((link) => (
-              <div
+              <Link
                 key={link.label}
-                style={{ position: 'relative' }}
-                onMouseEnter={() => link.dropdown && handleDropdownEnter(link.label)}
-                onMouseLeave={() => link.dropdown && handleDropdownLeave()}
+                href={link.href}
+                className={`nav-link ${isActive(link.href) ? 'nav-link-active' : 'nav-link-inactive'}`}
               >
-                <Link
-                  href={link.href}
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 300,
-                    color: isActive(link.href) ? textColor : inactiveColor,
-                    textDecoration: 'none',
-                    transition: 'opacity 0.25s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.6')}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-                >
-                  {link.label}
-                </Link>
-
-                {link.dropdown && openDropdown === link.label && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      paddingTop: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #e8e6e2',
-                        padding: '12px 20px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 10,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {link.dropdown.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 300,
-                            color: '#999999',
-                            textDecoration: 'none',
-                            transition: 'color 0.25s ease',
-                          }}
-                          onMouseEnter={(e) => (e.currentTarget.style.color = '#111111')}
-                          onMouseLeave={(e) => (e.currentTarget.style.color = '#999999')}
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+                {link.label}
+              </Link>
             ))}
           </div>
 
-          {/* Mobile hamburger */}
           <button
             className="nav-mobile-toggle"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
-            style={{
-              display: 'none',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-            }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <line x1="3" y1="6" x2="21" y2="6" stroke={textColor} strokeWidth="1.5" />
-              <line x1="3" y1="12" x2="21" y2="12" stroke={textColor} strokeWidth="1.5" />
-              <line x1="3" y1="18" x2="21" y2="18" stroke={textColor} strokeWidth="1.5" />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="nav-hamburger-icon">
+              <line x1="3" y1="6" x2="21" y2="6" strokeWidth="1.5" />
+              <line x1="3" y1="12" x2="21" y2="12" strokeWidth="1.5" />
+              <line x1="3" y1="18" x2="21" y2="18" strokeWidth="1.5" />
             </svg>
           </button>
         </div>
       </nav>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
           style={{
@@ -246,65 +174,96 @@ export default function Nav({ transparent = false }: NavProps) {
             </svg>
           </button>
 
-          <Link
-            href="/projects"
-            onClick={() => setMobileOpen(false)}
-            style={{
-              fontSize: 32,
-              fontWeight: 300,
-              color: isActive('/projects') ? '#111111' : '#999999',
-              textDecoration: 'none',
-            }}
-          >
-            Projects
-          </Link>
-          <Link
-            href="/people/team"
-            onClick={() => setMobileOpen(false)}
-            style={{
-              fontSize: 32,
-              fontWeight: 300,
-              color: isActive('/people') ? '#111111' : '#999999',
-              textDecoration: 'none',
-            }}
-          >
-            People
-          </Link>
-          <Link
-            href="/practice"
-            onClick={() => setMobileOpen(false)}
-            style={{
-              fontSize: 32,
-              fontWeight: 300,
-              color: isActive('/practice') ? '#111111' : '#999999',
-              textDecoration: 'none',
-            }}
-          >
-            Practice
-          </Link>
-          <Link
-            href="/journal"
-            onClick={() => setMobileOpen(false)}
-            style={{
-              fontSize: 32,
-              fontWeight: 300,
-              color: isActive('/journal') ? '#111111' : '#999999',
-              textDecoration: 'none',
-            }}
-          >
-            Journal
-          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                fontSize: 32,
+                fontWeight: 300,
+                color: isActive(link.href) ? '#111111' : '#999999',
+                textDecoration: 'none',
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
       )}
 
       <style jsx global>{`
+        /* === Base nav === */
+        .site-nav {
+          transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
+        }
+
+        /* Transparent mode (homepage hero) */
+        .site-nav-transparent {
+          background-color: transparent;
+          border-bottom: 1px solid transparent;
+        }
+        .site-nav-transparent[data-scrolled="true"] {
+          background-color: rgb(255, 255, 255);
+          border-bottom-color: rgb(232, 230, 226);
+        }
+
+        /* Solid mode (all other pages) */
+        .site-nav-solid {
+          background-color: rgb(255, 255, 255);
+          border-bottom: 1px solid rgb(232, 230, 226);
+        }
+
+        /* === Logo === */
+        .nav-logo-link {
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          transition: opacity 0.25s ease;
+        }
+        .nav-logo-link:hover { opacity: 0.6; }
+        .nav-logo { height: 32px !important; width: auto !important; }
+
+        .nav-logo-white { display: block; }
+        .nav-logo-dark { display: none; }
+        .site-nav[data-scrolled="true"] .nav-logo-white { display: none; }
+        .site-nav[data-scrolled="true"] .nav-logo-dark { display: block; }
+
+        /* === Nav links === */
+        .nav-link {
+          font-size: 15px;
+          font-weight: 300;
+          text-decoration: none;
+          transition: color 0.3s ease, opacity 0.25s ease;
+        }
+        .nav-link:hover { opacity: 0.6; }
+
+        /* Transparent mode link colors */
+        .site-nav-transparent .nav-link-active { color: #ffffff; }
+        .site-nav-transparent .nav-link-inactive { color: rgba(255, 255, 255, 0.65); }
+        .site-nav-transparent[data-scrolled="true"] .nav-link-active { color: #111111; }
+        .site-nav-transparent[data-scrolled="true"] .nav-link-inactive { color: #999999; }
+
+        /* Solid mode link colors */
+        .site-nav-solid .nav-link-active { color: #111111; }
+        .site-nav-solid .nav-link-inactive { color: #999999; }
+
+        /* === Hamburger icon === */
+        .site-nav-transparent .nav-hamburger-icon line { stroke: #ffffff; transition: stroke 0.3s ease; }
+        .site-nav-transparent[data-scrolled="true"] .nav-hamburger-icon line { stroke: #111111; }
+        .site-nav-solid .nav-hamburger-icon line { stroke: #111111; }
+
+        .nav-mobile-toggle {
+          display: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+        }
+
         @media (max-width: 767px) {
-          .nav-desktop {
-            display: none !important;
-          }
-          .nav-mobile-toggle {
-            display: block !important;
-          }
+          .nav-desktop { display: none !important; }
+          .nav-mobile-toggle { display: block !important; }
         }
       `}</style>
     </>

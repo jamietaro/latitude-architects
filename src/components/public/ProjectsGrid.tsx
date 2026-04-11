@@ -13,8 +13,7 @@ const SECTORS = [
   'CULTURE AND EDUCATION',
   'INTERIORS',
   'HISTORIC BUILDINGS',
-  'URBAN DESIGN',
-  'INDEX',
+  'COMPETITIONS',
 ];
 
 interface ProjectWithImages {
@@ -33,7 +32,7 @@ export default function ProjectsGrid({
   const [activeSector, setActiveSector] = useState('ALL');
 
   const filtered =
-    activeSector === 'ALL' || activeSector === 'INDEX'
+    activeSector === 'ALL'
       ? projects
       : projects.filter((p) =>
           p.sectors.toUpperCase().includes(activeSector)
@@ -78,33 +77,6 @@ export default function ProjectsGrid({
       </nav>
 
       {/* Grid */}
-      {activeSector === 'INDEX' ? (
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 40px 80px' }}>
-          {filtered.map((project) => (
-            <Link
-              key={project.id}
-              href={`/projects/${project.slug}`}
-              className="no-underline block"
-              style={{
-                borderBottom: '1px solid #e8e6e2',
-                padding: '12px 0',
-                display: 'flex',
-                justifyContent: 'space-between',
-                transition: 'opacity 0.25s ease',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.6')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-            >
-              <span style={{ fontSize: 14, fontWeight: 300, color: '#111111' }}>
-                {project.title}
-              </span>
-              <span style={{ fontSize: 13, fontWeight: 300, color: '#999999' }}>
-                {project.sectors}
-              </span>
-            </Link>
-          ))}
-        </div>
-      ) : (
         <div
           style={{
             display: 'grid',
@@ -163,7 +135,7 @@ export default function ProjectsGrid({
                       margin: '2px 0 0',
                     }}
                   >
-                    {project.sectors}
+                    {project.sectors.split(',').join(' \u00b7 ')}
                   </p>
                 </Link>
               </ScrollFadeIn>
@@ -185,7 +157,6 @@ export default function ProjectsGrid({
             </p>
           )}
         </div>
-      )}
 
       <style>{`
         @media (max-width: 767px) {

@@ -2,8 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import slugify from "slugify";
+import dynamic from "next/dynamic";
 import ImageUpload from "@/components/admin/ImageUpload";
-import TiptapEditor from "@/components/admin/TiptapEditor";
+
+const TiptapEditor = dynamic(
+  () => import("@/components/admin/TiptapEditor"),
+  { ssr: false }
+);
 
 interface NewsPost {
   id: number;

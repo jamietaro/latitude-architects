@@ -30,10 +30,10 @@ export default function Footer() {
           }}
         >
           <span style={{ fontSize: 13, fontWeight: 300, color: '#999999' }}>
-            020 7998 5680
+            +44 20 7234 0235
           </span>
           <a
-            href="mailto:info@latitudearchitects.com"
+            href="mailto:design@latitudearchitects.com"
             style={{
               fontSize: 13,
               fontWeight: 300,
@@ -42,7 +42,7 @@ export default function Footer() {
               transition: 'opacity 0.25s ease',
             }}
           >
-            info@latitudearchitects.com
+            design@latitudearchitects.com
           </a>
         </div>
 
@@ -78,7 +78,7 @@ export default function Footer() {
             Instagram
           </a>
           <Link
-            href="/privacy"
+            href="/privacy-policy"
             style={{
               fontSize: 13,
               fontWeight: 300,

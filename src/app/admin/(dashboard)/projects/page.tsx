@@ -2,9 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import slugify from "slugify";
+import dynamic from "next/dynamic";
 import ImageUpload from "@/components/admin/ImageUpload";
 import GalleryUpload, { GalleryImage } from "@/components/admin/GalleryUpload";
-import TiptapEditor from "@/components/admin/TiptapEditor";
+
+const TiptapEditor = dynamic(
+  () => import("@/components/admin/TiptapEditor"),
+  { ssr: false }
+);
 
 interface ProjectImage {
   id?: number;
@@ -339,8 +344,11 @@ export default function ProjectsPage() {
 
           {/* Form */}
           <div className="flex-1 overflow-y-auto p-4 space-y-5">
-            <div>
-              <label className={labelClass}>Main Image</label>
+            <div className="pb-5 mb-5 border-b border-[#2a2a2e]">
+              <label className={labelClass}>Hero Image</label>
+              <p className="text-[#666] text-xs mb-2">
+                Full-width banner shown at the top of the project page
+              </p>
               <ImageUpload value={mainImage} onChange={setMainImage} />
             </div>
 

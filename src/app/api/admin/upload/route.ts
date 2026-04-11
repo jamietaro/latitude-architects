@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { v2 as cloudinary } from "cloudinary";
+import { createClient } from "@supabase/supabase-js";
 
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -22,16 +21,24 @@ export async function POST(request: Request) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "latitude-architects" },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result as { secure_url: string });
-      }
-    );
-    uploadStream.end(buffer);
-  });
+  const ext = file.name.split(".").pop() || "jpg";
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const filePath = `uploads/${fileName}`;
 
-  return NextResponse.json({ url: result.secure_url });
+  const { error } = await supabase.storage
+    .from("media")
+    .upload(filePath, buffer, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("media")
+    .getPublicUrl(filePath);
+
+  return NextResponse.json({ url: publicUrlData.publicUrl });
 }

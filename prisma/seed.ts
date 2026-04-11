@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
 
-const connectionString = process.env.DATABASE_URL ?? "";
+dotenv.config();
+
+const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "";
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
@@ -11,7 +14,7 @@ async function main() {
 
   await prisma.adminUser.upsert({
     where: { email: "admin@latitudearchitects.com" },
-    update: {},
+    update: { passwordHash },
     create: {
       email: "admin@latitudearchitects.com",
       passwordHash,
