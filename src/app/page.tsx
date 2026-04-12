@@ -27,6 +27,7 @@ export default async function HomePage() {
   ]);
   const heroImage = siteSettings?.heroImageUrl ?? null;
   const heroOpacity = siteSettings?.heroImageOpacity ?? 1.0;
+  const heroTagline = siteSettings?.heroTagline ?? "Celebrating 25 years of crafting exceptional buildings across London and beyond.";
   const bannerImageUrl = siteSettings?.bannerImageUrl ?? null;
   const bannerTagline = siteSettings?.bannerTagline ?? "Buildings for people.";
   const bannerCta = siteSettings?.bannerCta ?? "Get in touch";
@@ -115,12 +116,27 @@ export default async function HomePage() {
         </HeroCaption>
       </section>
 
+      {/* Hero Tagline */}
+      <p
+        style={{
+          fontSize: 22,
+          fontWeight: 300,
+          color: '#111111',
+          textAlign: 'center',
+          maxWidth: 680,
+          margin: '0 auto',
+          padding: '48px 40px 32px',
+        }}
+      >
+        {heroTagline}
+      </p>
+
       {/* Projects Header */}
       <div
         style={{
           maxWidth: 1280,
           margin: '0 auto',
-          padding: '64px 40px 48px',
+          padding: '0 40px 48px',
           textAlign: 'center',
         }}
       >

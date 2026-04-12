@@ -6,6 +6,7 @@ import ImageUpload from "@/components/admin/ImageUpload";
 export default function HomepagePage() {
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
   const [heroImageOpacity, setHeroImageOpacity] = useState(1.0);
+  const [heroTagline, setHeroTagline] = useState("Celebrating 25 years of crafting exceptional buildings across London and beyond.");
   const [contactImageUrl, setContactImageUrl] = useState<string | null>(null);
   const [bannerImageUrl, setBannerImageUrl] = useState<string | null>(null);
   const [bannerTagline, setBannerTagline] = useState("Buildings for people.");
@@ -20,6 +21,7 @@ export default function HomepagePage() {
       const data = await res.json();
       setHeroImageUrl(data.heroImageUrl ?? null);
       setHeroImageOpacity(data.heroImageOpacity ?? 1.0);
+      setHeroTagline(data.heroTagline ?? "Celebrating 25 years of crafting exceptional buildings across London and beyond.");
       setContactImageUrl(data.contactImageUrl ?? null);
       setBannerImageUrl(data.bannerImageUrl ?? null);
       setBannerTagline(data.bannerTagline ?? "Buildings for people.");
@@ -39,7 +41,7 @@ export default function HomepagePage() {
       const res = await fetch("/api/admin/homepage", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroImageUrl, heroImageOpacity, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta }),
+        body: JSON.stringify({ heroImageUrl, heroImageOpacity, heroTagline, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta }),
       });
       if (res.ok) {
         setSaveStatus("Saved");
@@ -94,6 +96,18 @@ export default function HomepagePage() {
                 {heroImageOpacity.toFixed(2)}
               </span>
             </div>
+          </div>
+          <div className="mt-4">
+            <label className={labelClass}>Hero Tagline</label>
+            <p className="text-[#666] text-xs mb-2">
+              Displayed below the hero section, above the projects grid
+            </p>
+            <textarea
+              value={heroTagline}
+              onChange={(e) => setHeroTagline(e.target.value)}
+              rows={2}
+              className="bg-[#28282c] border border-[#444] text-white text-sm px-3 py-2 w-full rounded outline-none focus:border-[#666] transition-colors resize-none"
+            />
           </div>
         </div>
 

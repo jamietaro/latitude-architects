@@ -9,7 +9,7 @@ export async function GET() {
 
   const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
   return NextResponse.json(
-    settings ?? { id: 1, heroImageUrl: null, heroImageOpacity: 1.0, contactImageUrl: null, bannerImageUrl: null, bannerTagline: "Buildings for people.", bannerCta: "Get in touch" }
+    settings ?? { id: 1, heroImageUrl: null, heroImageOpacity: 1.0, heroTagline: "Celebrating 25 years of crafting exceptional buildings across London and beyond.", contactImageUrl: null, bannerImageUrl: null, bannerTagline: "Buildings for people.", bannerCta: "Get in touch" }
   );
 }
 
@@ -19,13 +19,14 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { heroImageUrl, heroImageOpacity, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta } = body;
+  const { heroImageUrl, heroImageOpacity, heroTagline, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta } = body;
 
   const settings = await prisma.siteSettings.upsert({
     where: { id: 1 },
     update: {
       heroImageUrl: heroImageUrl || null,
       heroImageOpacity: heroImageOpacity ?? 1.0,
+      heroTagline: heroTagline ?? "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
       contactImageUrl: contactImageUrl || null,
       bannerImageUrl: bannerImageUrl || null,
       bannerTagline: bannerTagline ?? "Buildings for people.",
@@ -35,6 +36,7 @@ export async function PUT(request: Request) {
       id: 1,
       heroImageUrl: heroImageUrl || null,
       heroImageOpacity: heroImageOpacity ?? 1.0,
+      heroTagline: heroTagline ?? "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
       contactImageUrl: contactImageUrl || null,
       bannerImageUrl: bannerImageUrl || null,
       bannerTagline: bannerTagline ?? "Buildings for people.",
