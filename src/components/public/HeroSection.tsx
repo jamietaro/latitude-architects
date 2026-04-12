@@ -21,8 +21,14 @@ export default function HeroSection({ slides }: { slides: HeroSlideData[] }) {
   const [index, setIndex] = useState(0);
   const captionRef = useRef<HTMLDivElement>(null);
 
-  // Preload all slide images on mount
+  // Preload all slide images on mount + debug log
   useEffect(() => {
+    console.log("[HeroSection] mounted with", slides.length, "slides");
+    slides.forEach((s, i) => {
+      console.log(
+        `  slide ${i}: id=${s.id} opacity=${s.opacity} url=${s.imageUrl}`
+      );
+    });
     if (slides.length === 0) return;
     slides.forEach((s) => {
       const img = new window.Image();
@@ -68,27 +74,41 @@ export default function HeroSection({ slides }: { slides: HeroSlideData[] }) {
             position: "absolute",
             inset: 0,
             backgroundColor: "#1a1a1a",
+            zIndex: 1,
           }}
         />
       ) : (
         <>
+          {/* Slide images — current at opacity 1, others at 0 for crossfade */}
           {slides.map((slide, i) => (
             <div
               key={slide.id}
               style={{
                 position: "absolute",
                 inset: 0,
-                opacity: i === index ? slide.opacity : 0,
+                opacity: i === index ? 1 : 0,
                 transition: "opacity 1s ease",
                 backgroundImage: `url(${slide.imageUrl})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 willChange: "opacity",
+                zIndex: 1,
               }}
               aria-hidden={i !== index}
             />
           ))}
-          <div className="absolute inset-0 bg-black/20" />
+          {/* Dark overlay for text legibility — per-slide opacity */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundColor: "#000000",
+              opacity: slides[index]?.opacity ?? 0.2,
+              transition: "opacity 1s ease",
+              pointerEvents: "none",
+              zIndex: 2,
+            }}
+          />
         </>
       )}
 

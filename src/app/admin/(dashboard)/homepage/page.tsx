@@ -43,7 +43,7 @@ export default function HomepagePage() {
         (data.heroSlides ?? []).map((s: Slide) => ({
           id: s.id,
           imageUrl: s.imageUrl,
-          opacity: s.opacity ?? 0.85,
+          opacity: s.opacity ?? 0.2,
           order: s.order ?? 0,
           projectId: s.projectId ?? null,
         }))
@@ -120,7 +120,7 @@ export default function HomepagePage() {
   function addSlide() {
     setHeroSlides((prev) => [
       ...prev,
-      { imageUrl: "", opacity: 0.85, order: prev.length, projectId: null },
+      { imageUrl: "", opacity: 0.2, order: prev.length, projectId: null },
     ]);
   }
 
@@ -203,8 +203,11 @@ export default function HomepagePage() {
 
                 <div>
                   <label className="text-[#888] text-xs mb-1 block">
-                    Opacity: {slide.opacity.toFixed(2)}
+                    Dark overlay: {slide.opacity.toFixed(2)}
                   </label>
+                  <p className="text-[#666] text-xs mb-1">
+                    0 = no overlay (image fully visible), 1 = fully dark
+                  </p>
                   <input
                     type="range"
                     min="0"

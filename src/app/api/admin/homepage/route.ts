@@ -97,7 +97,7 @@ export async function PUT(request: Request) {
         .map((s, idx) => ({
           siteSettingsId: 1,
           imageUrl: s.imageUrl,
-          opacity: typeof s.opacity === "number" ? s.opacity : 0.85,
+          opacity: typeof s.opacity === "number" ? s.opacity : 0.2,
           order: typeof s.order === "number" ? s.order : idx,
           projectId: s.projectId ?? null,
         })),
