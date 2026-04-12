@@ -6,9 +6,18 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
+  // Runtime queries go through the Supabase pgbouncer pooler (port 6543)
+  // which multiplexes across a small number of real Postgres connections.
+  // Fall back to DIRECT_URL only if DATABASE_URL isn't set (local dev
+  // without a pooler URL).
   const connectionString =
-    process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "";
-  const adapter = new PrismaPg({ connectionString });
+    process.env.DATABASE_URL ?? process.env.DIRECT_URL ?? "";
+
+  // Limit pg Pool to 1 connection per serverless instance. With warm
+  // function reuse via globalThis and pgbouncer on the far side, 1 is
+  // plenty — more just burns Supabase's session pool budget.
+  const adapter = new PrismaPg({ connectionString, max: 1 });
+
   return new PrismaClient({ adapter });
 }
 
