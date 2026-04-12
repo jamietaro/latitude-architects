@@ -6,17 +6,24 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  // Runtime queries go through the Supabase pgbouncer pooler (port 6543)
-  // which multiplexes across a small number of real Postgres connections.
-  // Fall back to DIRECT_URL only if DATABASE_URL isn't set (local dev
-  // without a pooler URL).
-  const connectionString =
-    process.env.DATABASE_URL ?? process.env.DIRECT_URL ?? "";
+  // In production (Vercel serverless) route runtime queries through
+  // the Supabase pgbouncer pooler (port 6543) with max: 1 — warm
+  // instances reuse via globalThis and pgbouncer multiplexes on the
+  // far side.
+  //
+  // In development prefer the DIRECT_URL (port 5432). Local HMR
+  // churns through PrismaClient instances faster than we can dispose
+  // them; a single pooled connection gets starved and requests hang
+  // waiting for the pool. A direct connection avoids that entirely.
+  const isProduction = process.env.NODE_ENV === "production";
 
-  // Limit pg Pool to 1 connection per serverless instance. With warm
-  // function reuse via globalThis and pgbouncer on the far side, 1 is
-  // plenty — more just burns Supabase's session pool budget.
-  const adapter = new PrismaPg({ connectionString, max: 1 });
+  const connectionString = isProduction
+    ? process.env.DATABASE_URL ?? process.env.DIRECT_URL ?? ""
+    : process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "";
+
+  const adapter = isProduction
+    ? new PrismaPg({ connectionString, max: 1 })
+    : new PrismaPg({ connectionString });
 
   return new PrismaClient({ adapter });
 }
