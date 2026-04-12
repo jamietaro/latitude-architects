@@ -3,30 +3,72 @@
 import { useState, useEffect, useCallback } from "react";
 import ImageUpload from "@/components/admin/ImageUpload";
 
+interface Slide {
+  id?: number;
+  imageUrl: string;
+  opacity: number;
+  order: number;
+  projectId: number | null;
+}
+
+interface ProjectOption {
+  id: number;
+  title: string;
+  slug: string;
+}
+
 export default function HomepagePage() {
-  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
-  const [heroImageOpacity, setHeroImageOpacity] = useState(1.0);
-  const [heroTagline, setHeroTagline] = useState("Celebrating 25 years of crafting exceptional buildings across London and beyond.");
+  const [heroSlides, setHeroSlides] = useState<Slide[]>([]);
+  const [heroTagline, setHeroTagline] = useState(
+    "Celebrating 25 years of crafting exceptional buildings across London and beyond."
+  );
   const [contactImageUrl, setContactImageUrl] = useState<string | null>(null);
   const [bannerImageUrl, setBannerImageUrl] = useState<string | null>(null);
   const [bannerTagline, setBannerTagline] = useState("Buildings for people.");
   const [bannerCta, setBannerCta] = useState("Get in touch");
+  const [projectOptions, setProjectOptions] = useState<ProjectOption[]>([]);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [loaded, setLoaded] = useState(false);
 
   const fetchSettings = useCallback(async () => {
-    const res = await fetch("/api/admin/homepage");
-    if (res.ok) {
-      const data = await res.json();
-      setHeroImageUrl(data.heroImageUrl ?? null);
-      setHeroImageOpacity(data.heroImageOpacity ?? 1.0);
-      setHeroTagline(data.heroTagline ?? "Celebrating 25 years of crafting exceptional buildings across London and beyond.");
+    const [settingsRes, projectsRes] = await Promise.all([
+      fetch("/api/admin/homepage"),
+      fetch("/api/admin/projects?published=true"),
+    ]);
+
+    if (settingsRes.ok) {
+      const data = await settingsRes.json();
+      setHeroSlides(
+        (data.heroSlides ?? []).map((s: Slide) => ({
+          id: s.id,
+          imageUrl: s.imageUrl,
+          opacity: s.opacity ?? 0.85,
+          order: s.order ?? 0,
+          projectId: s.projectId ?? null,
+        }))
+      );
+      setHeroTagline(
+        data.heroTagline ??
+          "Celebrating 25 years of crafting exceptional buildings across London and beyond."
+      );
       setContactImageUrl(data.contactImageUrl ?? null);
       setBannerImageUrl(data.bannerImageUrl ?? null);
       setBannerTagline(data.bannerTagline ?? "Buildings for people.");
       setBannerCta(data.bannerCta ?? "Get in touch");
     }
+
+    if (projectsRes.ok) {
+      const projects = await projectsRes.json();
+      setProjectOptions(
+        projects.map((p: ProjectOption) => ({
+          id: p.id,
+          title: p.title,
+          slug: p.slug,
+        }))
+      );
+    }
+
     setLoaded(true);
   }, []);
 
@@ -41,10 +83,24 @@ export default function HomepagePage() {
       const res = await fetch("/api/admin/homepage", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ heroImageUrl, heroImageOpacity, heroTagline, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta }),
+        body: JSON.stringify({
+          heroTagline,
+          contactImageUrl,
+          bannerImageUrl,
+          bannerTagline,
+          bannerCta,
+          heroSlides: heroSlides.map((s, idx) => ({
+            imageUrl: s.imageUrl,
+            opacity: s.opacity,
+            order: idx,
+            projectId: s.projectId,
+          })),
+        }),
       });
       if (res.ok) {
         setSaveStatus("Saved");
+        // Refresh from server to get new IDs
+        await fetchSettings();
       } else {
         setSaveStatus("Error saving");
       }
@@ -53,6 +109,33 @@ export default function HomepagePage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function updateSlide(index: number, patch: Partial<Slide>) {
+    setHeroSlides((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, ...patch } : s))
+    );
+  }
+
+  function addSlide() {
+    setHeroSlides((prev) => [
+      ...prev,
+      { imageUrl: "", opacity: 0.85, order: prev.length, projectId: null },
+    ]);
+  }
+
+  function removeSlide(index: number) {
+    setHeroSlides((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function moveSlide(index: number, direction: -1 | 1) {
+    setHeroSlides((prev) => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
   }
 
   if (!loaded) return null;
@@ -74,30 +157,102 @@ export default function HomepagePage() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-8">
-        <div className="max-w-[480px]">
-          <label className={labelClass}>Hero Image</label>
-          <p className="text-[#666] text-xs mb-2">
-            Full-viewport background image shown on the homepage
+        <div className="max-w-[640px]">
+          <label className={labelClass}>Hero Slides</label>
+          <p className="text-[#666] text-xs mb-4">
+            Slides cycle every 7 seconds on the homepage. Each slide can
+            optionally link to a project — the project title and sectors show
+            as overlay text.
           </p>
-          <ImageUpload value={heroImageUrl} onChange={setHeroImageUrl} />
-          <div className="mt-4">
-            <label className={labelClass}>Hero Image Opacity</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={heroImageOpacity}
-                onChange={(e) => setHeroImageOpacity(parseFloat(e.target.value))}
-                className="flex-1"
-              />
-              <span className="text-white text-sm w-10 text-right">
-                {heroImageOpacity.toFixed(2)}
-              </span>
-            </div>
+
+          <div className="space-y-4">
+            {heroSlides.map((slide, i) => (
+              <div
+                key={i}
+                className="border border-[#2a2a2e] rounded p-4 space-y-3 bg-[#181818]"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-xs">Slide {i + 1}</span>
+                  <div className="flex-1" />
+                  <button
+                    onClick={() => moveSlide(i, -1)}
+                    disabled={i === 0}
+                    className="text-[#888] text-xs px-2 py-1 hover:text-white disabled:opacity-30 cursor-pointer"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => moveSlide(i, 1)}
+                    disabled={i === heroSlides.length - 1}
+                    className="text-[#888] text-xs px-2 py-1 hover:text-white disabled:opacity-30 cursor-pointer"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    onClick={() => removeSlide(i)}
+                    className="text-red-400 text-xs px-2 py-1 hover:text-red-300 cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <ImageUpload
+                  value={slide.imageUrl || null}
+                  onChange={(url) => updateSlide(i, { imageUrl: url ?? "" })}
+                />
+
+                <div>
+                  <label className="text-[#888] text-xs mb-1 block">
+                    Opacity: {slide.opacity.toFixed(2)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={slide.opacity}
+                    onChange={(e) =>
+                      updateSlide(i, { opacity: parseFloat(e.target.value) })
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[#888] text-xs mb-1 block">
+                    Linked project (for overlay title)
+                  </label>
+                  <select
+                    value={slide.projectId ?? ""}
+                    onChange={(e) =>
+                      updateSlide(i, {
+                        projectId: e.target.value
+                          ? parseInt(e.target.value)
+                          : null,
+                      })
+                    }
+                    className="bg-[#28282c] border border-[#444] text-white text-sm h-11 px-3 w-full rounded outline-none focus:border-[#666]"
+                  >
+                    <option value="">No project (no overlay text)</option>
+                    {projectOptions.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="mt-4">
+
+          <button
+            onClick={addSlide}
+            className="mt-4 bg-[#28282c] border border-[#444] text-white text-sm px-4 py-2 rounded hover:bg-[#333] cursor-pointer"
+          >
+            + Add slide
+          </button>
+
+          <div className="mt-6">
             <label className={labelClass}>Hero Tagline</label>
             <p className="text-[#666] text-xs mb-2">
               Displayed below the hero section, above the projects grid

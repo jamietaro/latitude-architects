@@ -2,14 +2,49 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+interface SlideInput {
+  id?: number;
+  imageUrl: string;
+  opacity?: number;
+  order?: number;
+  projectId?: number | null;
+}
+
 export async function GET() {
   const session = await auth();
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  const settings = await prisma.siteSettings.findUnique({
+    where: { id: 1 },
+    include: {
+      heroSlides: {
+        orderBy: { order: "asc" },
+        include: {
+          project: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              sectors: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
   return NextResponse.json(
-    settings ?? { id: 1, heroImageUrl: null, heroImageOpacity: 1.0, heroTagline: "Celebrating 25 years of crafting exceptional buildings across London and beyond.", contactImageUrl: null, bannerImageUrl: null, bannerTagline: "Buildings for people.", bannerCta: "Get in touch" }
+    settings ?? {
+      id: 1,
+      heroTagline:
+        "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
+      contactImageUrl: null,
+      bannerImageUrl: null,
+      bannerTagline: "Buildings for people.",
+      bannerCta: "Get in touch",
+      heroSlides: [],
+    }
   );
 }
 
@@ -19,14 +54,22 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { heroImageUrl, heroImageOpacity, heroTagline, contactImageUrl, bannerImageUrl, bannerTagline, bannerCta } = body;
+  const {
+    heroTagline,
+    contactImageUrl,
+    bannerImageUrl,
+    bannerTagline,
+    bannerCta,
+    heroSlides,
+  } = body;
 
-  const settings = await prisma.siteSettings.upsert({
+  // Upsert base settings (without slides)
+  await prisma.siteSettings.upsert({
     where: { id: 1 },
     update: {
-      heroImageUrl: heroImageUrl || null,
-      heroImageOpacity: heroImageOpacity ?? 1.0,
-      heroTagline: heroTagline ?? "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
+      heroTagline:
+        heroTagline ??
+        "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
       contactImageUrl: contactImageUrl || null,
       bannerImageUrl: bannerImageUrl || null,
       bannerTagline: bannerTagline ?? "Buildings for people.",
@@ -34,9 +77,9 @@ export async function PUT(request: Request) {
     },
     create: {
       id: 1,
-      heroImageUrl: heroImageUrl || null,
-      heroImageOpacity: heroImageOpacity ?? 1.0,
-      heroTagline: heroTagline ?? "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
+      heroTagline:
+        heroTagline ??
+        "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
       contactImageUrl: contactImageUrl || null,
       bannerImageUrl: bannerImageUrl || null,
       bannerTagline: bannerTagline ?? "Buildings for people.",
@@ -44,5 +87,41 @@ export async function PUT(request: Request) {
     },
   });
 
-  return NextResponse.json(settings);
+  // Replace slides: delete all then recreate
+  const slides: SlideInput[] = Array.isArray(heroSlides) ? heroSlides : [];
+  await prisma.heroSlide.deleteMany({ where: { siteSettingsId: 1 } });
+  if (slides.length > 0) {
+    await prisma.heroSlide.createMany({
+      data: slides
+        .filter((s) => s.imageUrl)
+        .map((s, idx) => ({
+          siteSettingsId: 1,
+          imageUrl: s.imageUrl,
+          opacity: typeof s.opacity === "number" ? s.opacity : 0.85,
+          order: typeof s.order === "number" ? s.order : idx,
+          projectId: s.projectId ?? null,
+        })),
+    });
+  }
+
+  const full = await prisma.siteSettings.findUnique({
+    where: { id: 1 },
+    include: {
+      heroSlides: {
+        orderBy: { order: "asc" },
+        include: {
+          project: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              sectors: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return NextResponse.json(full);
 }

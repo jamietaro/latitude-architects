@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import FadeImage from '@/components/public/FadeImage';
 import ScrollFadeIn from '@/components/public/ScrollFadeIn';
+import { FILTER_TO_SLUG, FEATURED_CATEGORY } from '@/lib/categories';
 
 const SECTORS = [
   'ALL',
@@ -16,12 +17,25 @@ const SECTORS = [
   'COMPETITIONS',
 ];
 
+interface CategoryOrder {
+  category: string;
+  order: number;
+}
+
 interface ProjectWithImages {
   id: number;
   title: string;
   slug: string;
   sectors: string;
   images: { id: number; url: string; alt: string | null; order: number }[];
+  categoryOrders: CategoryOrder[];
+}
+
+function orderFor(project: ProjectWithImages, category: string): number {
+  return (
+    project.categoryOrders.find((co) => co.category === category)?.order ??
+    Number.POSITIVE_INFINITY
+  );
 }
 
 export default function ProjectsGrid({
@@ -31,12 +45,27 @@ export default function ProjectsGrid({
 }) {
   const [activeSector, setActiveSector] = useState('ALL');
 
-  const filtered =
-    activeSector === 'ALL'
-      ? projects
-      : projects.filter((p) =>
-          p.sectors.toUpperCase().includes(activeSector)
-        );
+  const filtered = useMemo(() => {
+    if (activeSector === 'ALL') {
+      // Default sort: use 'featured' order primary, then id as stable fallback
+      return [...projects].sort((a, b) => {
+        const ao = orderFor(a, FEATURED_CATEGORY);
+        const bo = orderFor(b, FEATURED_CATEGORY);
+        if (ao !== bo) return ao - bo;
+        return a.id - b.id;
+      });
+    }
+    const slug = FILTER_TO_SLUG[activeSector];
+    const matching = projects.filter((p) =>
+      p.sectors.toUpperCase().includes(activeSector)
+    );
+    return matching.sort((a, b) => {
+      const ao = orderFor(a, slug);
+      const bo = orderFor(b, slug);
+      if (ao !== bo) return ao - bo;
+      return a.id - b.id;
+    });
+  }, [projects, activeSector]);
 
   return (
     <>

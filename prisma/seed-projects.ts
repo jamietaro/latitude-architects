@@ -164,7 +164,6 @@ async function main() {
         description: project.description,
         featured: true,
         published: true,
-        order: project.order,
         images: {
           create: [{ url: imageUrl, alt: project.title, order: 0 }],
         },

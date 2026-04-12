@@ -1,6 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sectorsToSlugs, FEATURED_CATEGORY } from "@/lib/categories";
+
+type CategoryOrderInput = { category: string; order: number };
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -11,8 +14,11 @@ export async function GET(request: NextRequest) {
 
   const projects = await prisma.project.findMany({
     where: publishedOnly ? { published: true } : undefined,
-    include: { images: { orderBy: { order: "asc" } } },
-    orderBy: { order: "asc" },
+    include: {
+      images: { orderBy: { order: "asc" } },
+      categoryOrders: true,
+    },
+    orderBy: { id: "asc" },
   });
 
   return NextResponse.json(projects);
@@ -35,8 +41,8 @@ export async function POST(request: NextRequest) {
     description,
     featured,
     published,
-    order,
     images,
+    categoryOrders,
   } = body;
 
   const project = await prisma.project.create({
@@ -52,7 +58,6 @@ export async function POST(request: NextRequest) {
       description: description || "",
       featured: featured || false,
       published: published || false,
-      order: parseInt(order) || 0,
       images: {
         create: (images || []).map(
           (img: { url: string; alt?: string; order?: number }, idx: number) => ({
@@ -66,5 +71,31 @@ export async function POST(request: NextRequest) {
     include: { images: { orderBy: { order: "asc" } } },
   });
 
-  return NextResponse.json(project, { status: 201 });
+  // Create category orders based on sectors + featured flag
+  const validSlugs = new Set(sectorsToSlugs(sectors || ""));
+  if (featured) validSlugs.add(FEATURED_CATEGORY);
+
+  const incoming: CategoryOrderInput[] = (categoryOrders || []).filter(
+    (co: CategoryOrderInput) => validSlugs.has(co.category)
+  );
+
+  if (incoming.length > 0) {
+    await prisma.projectCategoryOrder.createMany({
+      data: incoming.map((co) => ({
+        projectId: project.id,
+        category: co.category,
+        order: Number(co.order) || 0,
+      })),
+    });
+  }
+
+  const full = await prisma.project.findUnique({
+    where: { id: project.id },
+    include: {
+      images: { orderBy: { order: "asc" } },
+      categoryOrders: true,
+    },
+  });
+
+  return NextResponse.json(full, { status: 201 });
 }

@@ -7,9 +7,9 @@ datasource db {
 }
 
 model Project {
-  id               Int            @id @default(autoincrement())
+  id               Int                    @id @default(autoincrement())
   title            String
-  slug             String         @unique
+  slug             String                 @unique
   location         String
   client           String?
   year             Int
@@ -17,12 +17,13 @@ model Project {
   sectors          String
   shortDescription String?
   description      String
-  featured         Boolean        @default(false)
-  published        Boolean        @default(false)
-  order            Int            @default(0)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  featured         Boolean                @default(false)
+  published        Boolean                @default(false)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
   images           ProjectImage[]
+  categoryOrders   ProjectCategoryOrder[]
+  heroSlides       HeroSlide[]
 }
 
 model ProjectImage {
@@ -32,6 +33,17 @@ model ProjectImage {
   url       String
   alt       String?
   order     Int     @default(0)
+}
+
+model ProjectCategoryOrder {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category  String
+  order     Int     @default(0)
+
+  @@unique([projectId, category])
+  @@index([category])
 }
 
 model NewsPost {
@@ -66,13 +78,23 @@ model AdminUser {
 }
 
 model SiteSettings {
-  id               Int      @id @default(1)
-  heroImageUrl     String?
-  heroImageOpacity Float?   @default(1.0)
-  heroTagline      String?  @default("Celebrating 25 years of crafting exceptional buildings across London and beyond.")
-  contactImageUrl  String?
-  bannerImageUrl   String?
-  bannerTagline    String?  @default("Buildings for people.")
-  bannerCta        String?  @default("Get in touch")
-  updatedAt        DateTime @updatedAt
+  id              Int         @id @default(1)
+  heroTagline     String?     @default("Celebrating 25 years of crafting exceptional buildings across London and beyond.")
+  contactImageUrl String?
+  bannerImageUrl  String?
+  bannerTagline   String?     @default("Buildings for people.")
+  bannerCta       String?     @default("Get in touch")
+  updatedAt       DateTime    @updatedAt
+  heroSlides      HeroSlide[]
+}
+
+model HeroSlide {
+  id             Int          @id @default(autoincrement())
+  siteSettingsId Int
+  settings       SiteSettings @relation(fields: [siteSettingsId], references: [id], onDelete: Cascade)
+  projectId      Int?
+  project        Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  imageUrl       String
+  opacity        Float        @default(0.85)
+  order          Int          @default(0)
 }

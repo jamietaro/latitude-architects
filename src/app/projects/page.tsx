@@ -6,8 +6,11 @@ import { prisma } from '@/lib/prisma';
 export default async function ProjectsPage() {
   const projects = await prisma.project.findMany({
     where: { published: true },
-    orderBy: { order: 'asc' },
-    include: { images: { orderBy: { order: 'asc' }, take: 1 } },
+    include: {
+      images: { orderBy: { order: 'asc' }, take: 1 },
+      categoryOrders: true,
+    },
+    orderBy: { id: 'asc' },
   });
 
   return (
