@@ -79,14 +79,13 @@ export default function HeroSection({ slides }: { slides: HeroSlideData[] }) {
         />
       ) : (
         <>
-          {/* Slide images — current at opacity 1, others at 0 for crossfade */}
           {slides.map((slide, i) => (
             <div
               key={slide.id}
               style={{
                 position: "absolute",
                 inset: 0,
-                opacity: i === index ? 1 : 0,
+                opacity: i === index ? slide.opacity : 0,
                 transition: "opacity 1s ease",
                 backgroundImage: `url(${slide.imageUrl})`,
                 backgroundSize: "cover",
@@ -97,18 +96,6 @@ export default function HeroSection({ slides }: { slides: HeroSlideData[] }) {
               aria-hidden={i !== index}
             />
           ))}
-          {/* Dark overlay for text legibility — per-slide opacity */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundColor: "#000000",
-              opacity: slides[index]?.opacity ?? 0.2,
-              transition: "opacity 1s ease",
-              pointerEvents: "none",
-              zIndex: 2,
-            }}
-          />
         </>
       )}
 

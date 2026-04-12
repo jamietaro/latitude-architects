@@ -203,11 +203,8 @@ export default function HomepagePage() {
 
                 <div>
                   <label className="text-[#888] text-xs mb-1 block">
-                    Dark overlay: {slide.opacity.toFixed(2)}
+                    Opacity: {slide.opacity.toFixed(2)}
                   </label>
-                  <p className="text-[#666] text-xs mb-1">
-                    0 = no overlay (image fully visible), 1 = fully dark
-                  </p>
                   <input
                     type="range"
                     min="0"
