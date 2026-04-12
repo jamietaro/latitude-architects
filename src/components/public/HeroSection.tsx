@@ -99,6 +99,21 @@ export default function HeroSection({ slides }: { slides: HeroSlideData[] }) {
         </>
       )}
 
+      {/* LEGIBILITY OVERLAY — currently Option D (top gradient)
+          To switch to Option A (radial vignette), replace the background value with:
+          background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 70%)
+      */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 5,
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 60%)",
+        }}
+      />
+
       <HeroContours />
 
       <div
