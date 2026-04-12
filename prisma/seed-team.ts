@@ -22,7 +22,7 @@ interface Member {
   title: string;
   order: number;
   bio: string;
-  photoUrl: string;
+  photoUrl: string | null;
 }
 
 // Bios extracted verbatim from latitudearchitects.com staff pages
@@ -73,6 +73,38 @@ const members: Member[] = [
     photoUrl:
       "https://latitudearchitects.com/wp-content/uploads/Staff-photos_AV_Website_250425-1.jpg",
   },
+  {
+    slug: "jamie-griffiths",
+    name: "Jamie Griffiths",
+    title: "Architect",
+    order: 5,
+    bio: "<p>Bio coming soon.</p>",
+    photoUrl: null,
+  },
+  {
+    slug: "norbu-verhagen",
+    name: "Norbu Verhagen",
+    title: "Architectural Assistant",
+    order: 6,
+    bio: "<p>Bio coming soon.</p>",
+    photoUrl: null,
+  },
+  {
+    slug: "helen-bertoli",
+    name: "Helen Bertoli",
+    title: "Architectural Assistant",
+    order: 7,
+    bio: "<p>Bio coming soon.</p>",
+    photoUrl: null,
+  },
+  {
+    slug: "eva-lakin",
+    name: "Eva Lakin",
+    title: "Architectural Assistant",
+    order: 8,
+    bio: "<p>Bio coming soon.</p>",
+    photoUrl: null,
+  },
 ];
 
 async function downloadAndUpload(sourceUrl: string, slug: string): Promise<string> {
@@ -102,12 +134,16 @@ async function main() {
     console.log(`\nProcessing ${m.name}...`);
 
     let photoUrl: string | null = null;
-    try {
-      console.log(`  Downloading ${m.photoUrl}`);
-      photoUrl = await downloadAndUpload(m.photoUrl, m.slug);
-      console.log(`  Uploaded to ${photoUrl}`);
-    } catch (e) {
-      console.error(`  Photo upload failed: ${(e as Error).message}`);
+    if (m.photoUrl) {
+      try {
+        console.log(`  Downloading ${m.photoUrl}`);
+        photoUrl = await downloadAndUpload(m.photoUrl, m.slug);
+        console.log(`  Uploaded to ${photoUrl}`);
+      } catch (e) {
+        console.error(`  Photo upload failed: ${(e as Error).message}`);
+      }
+    } else {
+      console.log(`  No photo source — skipping upload`);
     }
 
     const existing = await prisma.teamMember.findUnique({
