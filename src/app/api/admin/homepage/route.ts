@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -97,7 +98,7 @@ export async function PUT(request: Request) {
         .map((s, idx) => ({
           siteSettingsId: 1,
           imageUrl: s.imageUrl,
-          opacity: typeof s.opacity === "number" ? s.opacity : 0.2,
+          opacity: typeof s.opacity === "number" ? s.opacity : 0.85,
           order: typeof s.order === "number" ? s.order : idx,
           projectId: s.projectId ?? null,
         })),
@@ -122,6 +123,10 @@ export async function PUT(request: Request) {
       },
     },
   });
+
+  // Purge the Full Route Cache so public pages pick up the new settings
+  revalidatePath("/");
+  revalidatePath("/practice/contact");
 
   return NextResponse.json(full);
 }

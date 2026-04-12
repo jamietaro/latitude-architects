@@ -43,7 +43,7 @@ export default function HomepagePage() {
         (data.heroSlides ?? []).map((s: Slide) => ({
           id: s.id,
           imageUrl: s.imageUrl,
-          opacity: s.opacity ?? 0.2,
+          opacity: s.opacity ?? 0.85,
           order: s.order ?? 0,
           projectId: s.projectId ?? null,
         }))
@@ -120,7 +120,7 @@ export default function HomepagePage() {
   function addSlide() {
     setHeroSlides((prev) => [
       ...prev,
-      { imageUrl: "", opacity: 0.2, order: prev.length, projectId: null },
+      { imageUrl: "", opacity: 0.85, order: prev.length, projectId: null },
     ]);
   }
 

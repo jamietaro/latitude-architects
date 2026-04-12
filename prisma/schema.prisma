@@ -95,6 +95,6 @@ model HeroSlide {
   projectId      Int?
   project        Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
   imageUrl       String
-  opacity        Float        @default(0.2)
+  opacity        Float        @default(0.85)
   order          Int          @default(0)
 }
