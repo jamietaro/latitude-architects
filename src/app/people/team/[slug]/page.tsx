@@ -4,6 +4,8 @@ import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export default async function TeamMemberPage({
   params,
 }: {

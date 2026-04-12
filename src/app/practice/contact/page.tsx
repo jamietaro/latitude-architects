@@ -4,6 +4,8 @@ import Footer from "@/components/public/Footer";
 import PracticeSubNav from "@/components/public/PracticeSubNav";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function ContactPage() {
   const settings = await prisma.siteSettings.findUnique({
     where: { id: 1 },

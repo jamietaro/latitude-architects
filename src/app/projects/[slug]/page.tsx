@@ -4,6 +4,8 @@ import Footer from "@/components/public/Footer";
 import FadeImage from "@/components/public/FadeImage";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectDetailPage({
   params,
 }: {

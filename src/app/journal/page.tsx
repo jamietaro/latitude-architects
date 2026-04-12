@@ -5,6 +5,8 @@ import Footer from '@/components/public/Footer';
 import ScrollFadeIn from '@/components/public/ScrollFadeIn';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export default async function JournalPage() {
   const posts = await prisma.newsPost.findMany({
     where: { published: true },

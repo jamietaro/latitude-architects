@@ -3,6 +3,8 @@ import Footer from '@/components/public/Footer';
 import ProjectsGrid from '@/components/public/ProjectsGrid';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProjectsPage() {
   const projects = await prisma.project.findMany({
     where: { published: true },
