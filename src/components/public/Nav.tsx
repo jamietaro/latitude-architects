@@ -243,7 +243,7 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
 
         /* Transparent mode link colors */
         .site-nav-transparent .nav-link-active { color: #ffffff; }
-        .site-nav-transparent .nav-link-inactive { color: rgba(255, 255, 255, 0.65); }
+        .site-nav-transparent .nav-link-inactive { color: #ffffff; }
         .site-nav-transparent[data-scrolled="true"] .nav-link-active { color: #111111; }
         .site-nav-transparent[data-scrolled="true"] .nav-link-inactive { color: #999999; }
 
