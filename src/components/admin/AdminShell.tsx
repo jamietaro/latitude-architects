@@ -27,7 +27,7 @@ export default function AdminShell({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="admin-section flex min-h-screen">
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 w-[220px] h-screen bg-[#18181b] flex flex-col z-50">
         <div className="p-6">

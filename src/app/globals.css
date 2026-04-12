@@ -65,6 +65,11 @@ nav.site-nav-transparent[data-scrolled="true"] {
   opacity: 1;
 }
 
+/* Admin section override — images should be immediately visible */
+.admin-section img {
+  opacity: 1 !important;
+}
+
 /* Rich text content styles */
 .prose-content h2 {
   font-size: 18px;

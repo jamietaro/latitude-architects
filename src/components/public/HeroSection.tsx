@@ -63,7 +63,13 @@ export default function HeroSection({ slides }: { slides: HeroSlideData[] }) {
   return (
     <section className="relative h-screen w-full overflow-hidden">
       {slides.length === 0 ? (
-        <div className="absolute inset-0 bg-white" />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: "#1a1a1a",
+          }}
+        />
       ) : (
         <>
           {slides.map((slide, i) => (
