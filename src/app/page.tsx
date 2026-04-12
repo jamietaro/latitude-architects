@@ -7,6 +7,8 @@ import FadeImage from '@/components/public/FadeImage';
 import { prisma } from '@/lib/prisma';
 import { FEATURED_CATEGORY } from '@/lib/categories';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const [allFeatured, recentNews, siteSettings] = await Promise.all([
     prisma.project.findMany({

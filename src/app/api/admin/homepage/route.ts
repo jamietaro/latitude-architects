@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -123,10 +122,6 @@ export async function PUT(request: Request) {
       },
     },
   });
-
-  // Purge the Full Route Cache so public pages pick up the new settings
-  revalidatePath("/");
-  revalidatePath("/practice/contact");
 
   return NextResponse.json(full);
 }
