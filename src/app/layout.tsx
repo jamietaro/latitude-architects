@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   title: "Latitude Architects",
   description:
     "Latitude Architects and Designers Ltd is a RIBA Chartered architectural practice founded in 2000.",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
