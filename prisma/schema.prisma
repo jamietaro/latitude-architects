@@ -88,6 +88,13 @@ model SiteSettings {
   heroSlides      HeroSlide[]
 }
 
+model AboutBlock {
+  id       Int     @id
+  imageUrl String?
+  tagline  String?
+  body     String?
+}
+
 model HeroSlide {
   id             Int          @id @default(autoincrement())
   siteSettingsId Int
