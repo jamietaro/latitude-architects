@@ -128,24 +128,29 @@ export default function ProjectsGrid({
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.75')}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
                 >
-                  {img ? (
-                    <FadeImage
-                      src={img.url}
-                      alt={img.alt ?? project.title}
-                      width={1200}
-                      height={800}
-                      loading="lazy"
-                      style={{ width: '100%', height: 'auto' }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: '100%',
-                        aspectRatio: '3/2',
-                        backgroundColor: '#f3f3f3',
-                      }}
-                    />
-                  )}
+                  <div
+                    style={{
+                      width: '100%',
+                      aspectRatio: '4/3',
+                      overflow: 'hidden',
+                      backgroundColor: '#f3f3f3',
+                    }}
+                  >
+                    {img && (
+                      <FadeImage
+                        src={img.url}
+                        alt={img.alt ?? project.title}
+                        width={1200}
+                        height={800}
+                        loading="lazy"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    )}
+                  </div>
                   <p
                     style={{
                       fontSize: 14,
