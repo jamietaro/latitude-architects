@@ -3,7 +3,33 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sectorsToSlugs, FEATURED_CATEGORY } from "@/lib/categories";
 
-type CategoryOrderInput = { category: string; order: number };
+// For each category the project belongs to but doesn't yet have an
+// ordering entry for, append it at the bottom of that category:
+// order = (current max order in that category) + 1.
+async function appendMissingCategoryOrders(
+  projectId: number,
+  categorySlugs: string[]
+) {
+  if (categorySlugs.length === 0) return;
+
+  const existing = await prisma.projectCategoryOrder.findMany({
+    where: { projectId, category: { in: categorySlugs } },
+    select: { category: true },
+  });
+  const existingSet = new Set(existing.map((e) => e.category));
+  const missing = categorySlugs.filter((c) => !existingSet.has(c));
+
+  for (const category of missing) {
+    const max = await prisma.projectCategoryOrder.aggregate({
+      where: { category },
+      _max: { order: true },
+    });
+    const nextOrder = (max._max.order ?? -1) + 1;
+    await prisma.projectCategoryOrder.create({
+      data: { projectId, category, order: nextOrder },
+    });
+  }
+}
 
 export async function GET(
   request: NextRequest,
@@ -50,7 +76,6 @@ export async function PUT(
     featured,
     published,
     images,
-    categoryOrders,
   } = body;
 
   // Delete existing images and recreate
@@ -84,35 +109,21 @@ export async function PUT(
     },
   });
 
-  // Reconcile categoryOrders against valid categories for this project
-  const validSlugs = new Set(sectorsToSlugs(sectors || ""));
-  if (featured) validSlugs.add(FEATURED_CATEGORY);
+  // Reconcile ProjectCategoryOrder rows:
+  //  - drop any category that no longer applies (sector removed / unfeatured)
+  //  - append any newly-applicable category at the bottom of its list
+  // Existing entries for still-valid categories keep their existing order.
+  const targetSlugs = sectorsToSlugs(sectors || "");
+  if (featured) targetSlugs.push(FEATURED_CATEGORY);
 
-  // Remove any category orders that no longer apply (sector removed, unfeatured)
   await prisma.projectCategoryOrder.deleteMany({
     where: {
       projectId,
-      category: { notIn: Array.from(validSlugs) },
+      category: { notIn: targetSlugs },
     },
   });
 
-  // Upsert each incoming category order
-  const incoming: CategoryOrderInput[] = (categoryOrders || []).filter(
-    (co: CategoryOrderInput) => validSlugs.has(co.category)
-  );
-  for (const co of incoming) {
-    await prisma.projectCategoryOrder.upsert({
-      where: {
-        projectId_category: { projectId, category: co.category },
-      },
-      update: { order: Number(co.order) || 0 },
-      create: {
-        projectId,
-        category: co.category,
-        order: Number(co.order) || 0,
-      },
-    });
-  }
+  await appendMissingCategoryOrders(projectId, targetSlugs);
 
   const full = await prisma.project.findUnique({
     where: { id: projectId },

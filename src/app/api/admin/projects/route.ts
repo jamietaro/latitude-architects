@@ -3,7 +3,33 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sectorsToSlugs, FEATURED_CATEGORY } from "@/lib/categories";
 
-type CategoryOrderInput = { category: string; order: number };
+// For each category the project belongs to but doesn't yet have an
+// ordering entry for, append it at the bottom of that category:
+// order = (current max order in that category) + 1.
+async function appendMissingCategoryOrders(
+  projectId: number,
+  categorySlugs: string[]
+) {
+  if (categorySlugs.length === 0) return;
+
+  const existing = await prisma.projectCategoryOrder.findMany({
+    where: { projectId, category: { in: categorySlugs } },
+    select: { category: true },
+  });
+  const existingSet = new Set(existing.map((e) => e.category));
+  const missing = categorySlugs.filter((c) => !existingSet.has(c));
+
+  for (const category of missing) {
+    const max = await prisma.projectCategoryOrder.aggregate({
+      where: { category },
+      _max: { order: true },
+    });
+    const nextOrder = (max._max.order ?? -1) + 1;
+    await prisma.projectCategoryOrder.create({
+      data: { projectId, category, order: nextOrder },
+    });
+  }
+}
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -42,7 +68,6 @@ export async function POST(request: NextRequest) {
     featured,
     published,
     images,
-    categoryOrders,
   } = body;
 
   const project = await prisma.project.create({
@@ -71,23 +96,10 @@ export async function POST(request: NextRequest) {
     include: { images: { orderBy: { order: "asc" } } },
   });
 
-  // Create category orders based on sectors + featured flag
-  const validSlugs = new Set(sectorsToSlugs(sectors || ""));
-  if (featured) validSlugs.add(FEATURED_CATEGORY);
-
-  const incoming: CategoryOrderInput[] = (categoryOrders || []).filter(
-    (co: CategoryOrderInput) => validSlugs.has(co.category)
-  );
-
-  if (incoming.length > 0) {
-    await prisma.projectCategoryOrder.createMany({
-      data: incoming.map((co) => ({
-        projectId: project.id,
-        category: co.category,
-        order: Number(co.order) || 0,
-      })),
-    });
-  }
+  // Auto-append category orders for each sector + featured if applicable
+  const targetSlugs = sectorsToSlugs(sectors || "");
+  if (featured) targetSlugs.push(FEATURED_CATEGORY);
+  await appendMissingCategoryOrders(project.id, targetSlugs);
 
   const full = await prisma.project.findUnique({
     where: { id: project.id },

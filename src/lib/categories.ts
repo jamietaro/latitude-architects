@@ -14,6 +14,27 @@ export const SECTOR_TO_SLUG: Record<string, string> = {
 
 export const FEATURED_CATEGORY = "featured";
 
+// Tab sequence for the admin Order page. `Featured` first, then sectors.
+// Each entry has a slug (ProjectCategoryOrder.category) and a human label.
+// `sector` is the value stored inside Project.sectors — null for "featured".
+export interface CategoryTab {
+  slug: string;
+  label: string;
+  sector: string | null;
+}
+
+export const CATEGORY_TABS: CategoryTab[] = [
+  { slug: FEATURED_CATEGORY, label: "Featured", sector: null },
+  { slug: "residential", label: "Residential", sector: "Residential" },
+  { slug: "offices", label: "Offices", sector: "Offices" },
+  { slug: "mixed-use", label: "Mixed Use", sector: "Mixed Use" },
+  { slug: "culture-education", label: "Culture and Education", sector: "Culture and Education" },
+  { slug: "interiors", label: "Interiors", sector: "Interiors" },
+  { slug: "historic-buildings", label: "Historic Buildings", sector: "Historic Buildings" },
+  { slug: "urban-design", label: "Urban Design", sector: "Urban Design" },
+  { slug: "competitions", label: "Competitions", sector: "Competitions" },
+];
+
 export function sectorsToSlugs(sectors: string): string[] {
   return sectors
     .split(",")

@@ -5,7 +5,6 @@ import slugify from "slugify";
 import dynamic from "next/dynamic";
 import ImageUpload from "@/components/admin/ImageUpload";
 import GalleryUpload, { GalleryImage } from "@/components/admin/GalleryUpload";
-import { SECTOR_TO_SLUG, FEATURED_CATEGORY } from "@/lib/categories";
 
 const TiptapEditor = dynamic(
   () => import("@/components/admin/TiptapEditor"),
@@ -16,11 +15,6 @@ interface ProjectImage {
   id?: number;
   url: string;
   alt: string;
-  order: number;
-}
-
-interface CategoryOrder {
-  category: string;
   order: number;
 }
 
@@ -38,7 +32,6 @@ interface Project {
   featured: boolean;
   published: boolean;
   images: ProjectImage[];
-  categoryOrders: CategoryOrder[];
 }
 
 const SECTORS = [
@@ -72,7 +65,6 @@ const emptyProject: Omit<Project, "id"> = {
   featured: false,
   published: false,
   images: [],
-  categoryOrders: [],
 };
 
 const inputClass =
@@ -117,7 +109,6 @@ export default function ProjectsPage() {
       featured: project.featured,
       published: project.published,
       images: project.images,
-      categoryOrders: project.categoryOrders ?? [],
     });
     setSaveStatus("");
     setMenuOpen(false);
@@ -147,27 +138,6 @@ export default function ProjectsPage() {
       ? current.filter((s) => s !== sector)
       : [...current, sector];
     updateField("sectors", updated.join(","));
-  }
-
-  // Build the list of active category slugs for the current form
-  const activeCategories: { slug: string; label: string }[] = (() => {
-    const out: { slug: string; label: string }[] = [];
-    const sectors = form.sectors ? form.sectors.split(",").filter(Boolean) : [];
-    for (const s of sectors) {
-      const slug = SECTOR_TO_SLUG[s];
-      if (slug) out.push({ slug, label: s });
-    }
-    if (form.featured) out.push({ slug: FEATURED_CATEGORY, label: "Featured" });
-    return out;
-  })();
-
-  function getCategoryOrder(slug: string): number {
-    return form.categoryOrders.find((co) => co.category === slug)?.order ?? 0;
-  }
-
-  function setCategoryOrder(slug: string, value: number) {
-    const existing = form.categoryOrders.filter((co) => co.category !== slug);
-    updateField("categoryOrders", [...existing, { category: slug, order: value }]);
   }
 
   // Main image = first image in the images array
@@ -515,34 +485,16 @@ export default function ProjectsPage() {
             </div>
 
             <div>
-              <label className={labelClass}>Order by Category</label>
-              {activeCategories.length === 0 ? (
-                <p className="text-[#666] text-xs mt-2">
-                  Select at least one sector (and/or mark as featured) to set
-                  ordering.
-                </p>
-              ) : (
-                <div className="space-y-2 mt-2">
-                  {activeCategories.map((cat) => (
-                    <div key={cat.slug} className="flex items-center gap-3">
-                      <span className="text-white text-sm flex-1">
-                        {cat.label}
-                      </span>
-                      <input
-                        type="number"
-                        value={getCategoryOrder(cat.slug)}
-                        onChange={(e) =>
-                          setCategoryOrder(
-                            cat.slug,
-                            parseInt(e.target.value) || 0
-                          )
-                        }
-                        className="bg-[#28282c] border border-[#444] text-white text-sm h-9 px-3 w-24 rounded outline-none focus:border-[#666]"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className="text-[#666] text-xs">
+                Set the display order for each category in{" "}
+                <a
+                  href="/admin/order"
+                  className="text-white hover:underline"
+                >
+                  Order
+                </a>
+                .
+              </p>
             </div>
           </div>
         </div>
