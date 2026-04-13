@@ -293,6 +293,8 @@ export default async function HomePage() {
       {/* Banner */}
       <section
         style={{
+          position: 'relative',
+          overflow: 'hidden',
           width: '100%',
           height: '33vh',
           backgroundImage: bannerImageUrl ? `url(${bannerImageUrl})` : 'none',
@@ -306,8 +308,24 @@ export default async function HomePage() {
           gap: 16,
         }}
       >
+        {/* LEGIBILITY OVERLAY — bottom gradient
+            To switch to radial vignette:
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 70%)
+        */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 1,
+            background:
+              'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%)',
+          }}
+        />
         <p
           style={{
+            position: 'relative',
+            zIndex: 2,
             fontSize: 32,
             fontWeight: 300,
             color: '#ffffff',
@@ -323,6 +341,8 @@ export default async function HomePage() {
           href="/practice/contact"
           className="banner-cta"
           style={{
+            position: 'relative',
+            zIndex: 2,
             fontSize: 13,
             fontWeight: 300,
             color: '#ffffff',
