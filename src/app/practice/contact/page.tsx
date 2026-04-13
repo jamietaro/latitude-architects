@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import FadeImage from "@/components/public/FadeImage";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
@@ -5,6 +6,13 @@ import PracticeSubNav from "@/components/public/PracticeSubNav";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Contact Latitude Architects at 15 Weller Street, London SE1 1QU. Tel: +44 20 7234 0235.",
+  alternates: { canonical: "/practice/contact" },
+};
 
 export default async function ContactPage() {
   const settings = await prisma.siteSettings.findUnique({

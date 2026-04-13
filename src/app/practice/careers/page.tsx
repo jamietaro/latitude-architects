@@ -1,6 +1,14 @@
+import type { Metadata } from 'next';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import PracticeSubNav from '@/components/public/PracticeSubNav';
+
+export const metadata: Metadata = {
+  title: 'Careers',
+  description:
+    'Join Latitude Architects. We are committed to an inclusive approach to recruitment. Current vacancies include Architect and Part II Architectural Assistant.',
+  alternates: { canonical: '/practice/careers' },
+};
 
 const vacancies = ['Architect', 'Part II Architectural Assistant'];
 

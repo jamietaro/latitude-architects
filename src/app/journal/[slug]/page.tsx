@@ -1,10 +1,39 @@
+import type { Metadata } from 'next';
 import FadeImage from '@/components/public/FadeImage';
 import { notFound } from 'next/navigation';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import { prisma } from '@/lib/prisma';
+import { stripHtml, truncate } from '@/lib/text';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await prisma.newsPost.findUnique({
+    where: { slug, published: true },
+  });
+
+  if (!post) return { title: 'Post not found' };
+
+  const description = truncate(stripHtml(post.body || ''), 160) || undefined;
+
+  return {
+    title: post.title,
+    description,
+    alternates: { canonical: `/journal/${slug}` },
+    openGraph: {
+      title: post.title,
+      description,
+      type: 'article',
+      ...(post.image ? { images: [{ url: post.image, alt: post.title }] } : {}),
+    },
+  };
+}
 
 export default async function JournalPostPage({
   params,

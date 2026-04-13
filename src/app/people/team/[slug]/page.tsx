@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import FadeImage from '@/components/public/FadeImage';
 import { notFound } from 'next/navigation';
 import Nav from '@/components/public/Nav';
@@ -5,6 +6,30 @@ import Footer from '@/components/public/Footer';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const member = await prisma.teamMember.findUnique({
+    where: { slug, published: true },
+  });
+
+  if (!member) return { title: 'Team member not found' };
+
+  const title = member.title ? `${member.name}, ${member.title}` : member.name;
+  return {
+    title,
+    alternates: { canonical: `/people/team/${slug}` },
+    openGraph: {
+      title,
+      type: 'profile',
+      ...(member.photo ? { images: [{ url: member.photo, alt: member.name }] } : {}),
+    },
+  };
+}
 
 export default async function TeamMemberPage({
   params,

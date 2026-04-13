@@ -1,13 +1,49 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import ScrollFadeIn from '@/components/public/ScrollFadeIn';
 import HeroSection, { type HeroSlideData } from '@/components/public/HeroSection';
 import FadeImage from '@/components/public/FadeImage';
+import StructuredData from '@/components/StructuredData';
 import { prisma } from '@/lib/prisma';
 import { FEATURED_CATEGORY } from '@/lib/categories';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: {
+    // absolute: bypass the "%s | Latitude Architects" template so the
+    // homepage keeps its full branded title.
+    absolute: 'Latitude Architects | Award-Winning London Architectural Practice',
+  },
+  description:
+    'Latitude Architects is a RIBA Chartered practice founded in 2000, specialising in heritage buildings, high-end residential, and complex commercial projects across central London.',
+  alternates: { canonical: '/' },
+};
+
+const homepageStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'Latitude Architects',
+  alternateName: 'Latitude Architects and Designers Ltd',
+  url: 'https://latitudearchitects.com',
+  logo: 'https://latitudearchitects.com/images/logo-dark.png',
+  description:
+    'RIBA Chartered architectural practice founded in 2000, specialising in heritage buildings, high-end residential, and complex commercial projects across central London.',
+  foundingDate: '2000',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '15 Weller Street',
+    addressLocality: 'London',
+    postalCode: 'SE1 1QU',
+    addressCountry: 'GB',
+  },
+  telephone: '+442072340235',
+  email: 'design@latitudearchitects.com',
+  areaServed: 'London',
+  hasCredential: 'RIBA Chartered Practice',
+};
 
 export default async function HomePage() {
   const [allFeatured, recentNews, siteSettings] = await Promise.all([
@@ -81,6 +117,7 @@ export default async function HomePage() {
 
   return (
     <main>
+      <StructuredData data={homepageStructuredData} />
       <Nav transparent={true} darkBackground={heroSlides.length > 0} />
 
       <HeroSection slides={heroSlides} />

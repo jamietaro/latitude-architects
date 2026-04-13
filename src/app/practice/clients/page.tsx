@@ -1,6 +1,14 @@
+import type { Metadata } from 'next';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import PracticeSubNav from '@/components/public/PracticeSubNav';
+
+export const metadata: Metadata = {
+  title: 'Clients',
+  description:
+    'Latitude Architects works with leading institutional and private clients including Grosvenor, The Portman Estate, Hermes Investment Management, and the National Trust.',
+  alternates: { canonical: '/practice/clients' },
+};
 
 const clients = [
   'Aberdeen Asset Management Ltd',

@@ -1,10 +1,51 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
 import FadeImage from "@/components/public/FadeImage";
 import { prisma } from "@/lib/prisma";
+import { stripHtml, truncate } from "@/lib/text";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await prisma.project.findUnique({
+    where: { slug, published: true },
+    include: { images: { orderBy: { order: "asc" }, take: 1 } },
+  });
+
+  if (!project) return { title: "Project not found" };
+
+  const title = project.location
+    ? `${project.title}, ${project.location}`
+    : project.title;
+
+  const description =
+    project.shortDescription ||
+    truncate(stripHtml(project.description || ""), 160) ||
+    undefined;
+
+  const firstImage = project.images[0]?.url;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/projects/${slug}` },
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      ...(firstImage
+        ? { images: [{ url: firstImage, alt: project.title }] }
+        : {}),
+    },
+  };
+}
 
 export default async function ProjectDetailPage({
   params,

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import PracticeSubNav from '@/components/public/PracticeSubNav';
@@ -5,6 +6,13 @@ import FadeImage from '@/components/public/FadeImage';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Practice',
+  description:
+    "Latitude Architects is an independent London practice with 25 years of experience delivering exceptional buildings in the most constrained planning environments in the capital.",
+  alternates: { canonical: '/practice' },
+};
 
 export default async function PracticePage() {
   const blocks = await prisma.aboutBlock.findMany({

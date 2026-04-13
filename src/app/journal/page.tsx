@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import FadeImage from '@/components/public/FadeImage';
 import Link from 'next/link';
 import Nav from '@/components/public/Nav';
@@ -6,6 +7,12 @@ import ScrollFadeIn from '@/components/public/ScrollFadeIn';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Journal',
+  description: 'News and updates from Latitude Architects.',
+  alternates: { canonical: '/journal' },
+};
 
 export default async function JournalPage() {
   const posts = await prisma.newsPost.findMany({

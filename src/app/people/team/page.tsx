@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import FadeImage from '@/components/public/FadeImage';
 import Link from 'next/link';
 import Nav from '@/components/public/Nav';
@@ -5,6 +6,13 @@ import Footer from '@/components/public/Footer';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'People',
+  description:
+    "Meet the team at Latitude Architects \u2014 architects and designers working across London's most complex and sensitive building projects.",
+  alternates: { canonical: '/people/team' },
+};
 
 export default async function TeamPage() {
   const members = await prisma.teamMember.findMany({
