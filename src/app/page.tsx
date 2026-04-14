@@ -257,33 +257,64 @@ export default async function HomePage() {
               <Link
                 href={`/journal/${post.slug}`}
                 className="no-underline block"
-                style={{ transition: 'opacity 0.25s ease' }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 20,
+                  transition: 'opacity 0.25s ease',
+                }}
               >
-                <p
+                <div
                   style={{
-                    fontSize: 13,
-                    fontWeight: 300,
-                    color: '#999999',
-                    margin: 0,
+                    width: 200,
+                    height: 140,
+                    flexShrink: 0,
+                    overflow: 'hidden',
+                    backgroundColor: '#f3f3f3',
                   }}
                 >
-                  {post.category} &mdash;{' '}
-                  {post.date.toLocaleDateString('en-GB', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
-                </p>
-                <p
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 300,
-                    color: '#111111',
-                    margin: '4px 0 0',
-                  }}
-                >
-                  {post.title}
-                </p>
+                  {post.image && (
+                    <FadeImage
+                      src={post.image}
+                      alt={post.title}
+                      width={600}
+                      height={420}
+                      loading="lazy"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 300,
+                      color: '#999999',
+                      margin: 0,
+                    }}
+                  >
+                    {post.category} &mdash;{' '}
+                    {post.date.toLocaleDateString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 300,
+                      color: '#111111',
+                      margin: '4px 0 0',
+                    }}
+                  >
+                    {post.title}
+                  </p>
+                </div>
               </Link>
             </div>
           ))}

@@ -26,6 +26,7 @@ const CATEGORIES = [
   "Award",
   "Completion",
   "Press",
+  "Journal",
   "Other",
 ];
 
