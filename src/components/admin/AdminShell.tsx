@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -8,7 +9,7 @@ const navItems = [
   { label: "Homepage", href: "/admin/homepage" },
   { label: "Projects", href: "/admin/projects" },
   { label: "Order", href: "/admin/order" },
-  { label: "News", href: "/admin/news" },
+  { label: "Journal", href: "/admin/news" },
   { label: "Team", href: "/admin/team" },
   { label: "Practice", href: "/admin/practice" },
   { label: "Settings", href: "/admin/settings" },
@@ -33,16 +34,14 @@ export default function AdminShell({
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 w-[220px] h-screen bg-[#18181b] flex flex-col z-50">
         <div className="p-6">
-          <span
-            className="text-white lowercase"
-            style={{
-              fontSize: "13px",
-              fontWeight: 300,
-              letterSpacing: "0.05em",
-            }}
-          >
-            latitude
-          </span>
+          <Image
+            src="/images/logo-white.png"
+            alt="Latitude Architects"
+            width={120}
+            height={34}
+            priority
+            style={{ width: 120, height: "auto" }}
+          />
         </div>
 
         <nav className="flex-1">

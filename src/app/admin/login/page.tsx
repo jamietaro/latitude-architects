@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -39,16 +40,14 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#111] flex items-center justify-center">
       <div className="bg-[#1c1c1f] p-8 w-[380px] rounded">
         <div className="mb-8">
-          <span
-            className="text-white lowercase"
-            style={{
-              fontSize: "13px",
-              fontWeight: 300,
-              letterSpacing: "0.05em",
-            }}
-          >
-            latitude
-          </span>
+          <Image
+            src="/images/logo-white.png"
+            alt="Latitude Architects"
+            width={120}
+            height={34}
+            priority
+            style={{ width: 120, height: "auto" }}
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

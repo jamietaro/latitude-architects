@@ -266,8 +266,8 @@ export default async function HomePage() {
               >
                 <div
                   style={{
-                    width: 200,
-                    height: 140,
+                    width: 210,
+                    aspectRatio: '3/2',
                     flexShrink: 0,
                     overflow: 'hidden',
                     backgroundColor: '#f3f3f3',
@@ -278,7 +278,7 @@ export default async function HomePage() {
                       src={post.image}
                       alt={post.title}
                       width={600}
-                      height={420}
+                      height={400}
                       loading="lazy"
                       style={{
                         width: '100%',
@@ -369,7 +369,7 @@ export default async function HomePage() {
           {bannerTagline}
         </p>
         <Link
-          href="/practice/contact"
+          href="/contact"
           className="banner-cta"
           style={{
             position: 'relative',

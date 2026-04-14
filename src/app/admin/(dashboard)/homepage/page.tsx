@@ -297,7 +297,7 @@ export default function HomepagePage() {
               onChange={(e) => setBannerCta(e.target.value)}
               className="bg-[#28282c] border border-[#444] text-white text-sm h-11 px-3 w-full rounded outline-none focus:border-[#666] transition-colors"
             />
-            <p className="text-[#666] text-xs mt-1">Links to /practice/contact</p>
+            <p className="text-[#666] text-xs mt-1">Links to /contact</p>
           </div>
         </div>
       </div>

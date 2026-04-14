@@ -77,25 +77,35 @@ export default async function JournalPage() {
                   className="no-underline block"
                   style={{ transition: 'opacity 0.25s ease' }}
                 >
-                  {post.image && (
-                    <FadeImage
-                      src={post.image}
-                      alt={post.title}
-                      width={1200}
-                      height={800}
-                      loading="lazy"
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                      }}
-                    />
-                  )}
+                  <div
+                    style={{
+                      width: '100%',
+                      aspectRatio: '3/2',
+                      overflow: 'hidden',
+                      backgroundColor: '#f3f3f3',
+                    }}
+                  >
+                    {post.image && (
+                      <FadeImage
+                        src={post.image}
+                        alt={post.title}
+                        width={1200}
+                        height={800}
+                        loading="lazy"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    )}
+                  </div>
                   <p
                     style={{
                       fontSize: 15,
                       fontWeight: 300,
                       color: '#111111',
-                      margin: post.image ? '14px 0 0' : '0',
+                      margin: '14px 0 0',
                     }}
                   >
                     {post.title}

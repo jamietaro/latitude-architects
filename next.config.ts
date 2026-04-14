@@ -34,7 +34,18 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/contact/",
-        destination: "/practice/contact",
+        destination: "/contact",
+        permanent: true,
+      },
+      // Internal move: /practice/contact → /contact
+      {
+        source: "/practice/contact",
+        destination: "/contact",
+        permanent: true,
+      },
+      {
+        source: "/practice/contact/",
+        destination: "/contact",
         permanent: true,
       },
 

@@ -7,7 +7,6 @@ const links = [
   { label: 'ABOUT', href: '/practice' },
   { label: 'CLIENTS', href: '/practice/clients' },
   { label: 'CAREERS', href: '/practice/careers' },
-  { label: 'CONTACT', href: '/practice/contact' },
 ];
 
 export default function PracticeSubNav() {

@@ -14,6 +14,7 @@ const navLinks = [
   { label: 'Projects', href: '/projects' },
   { label: 'People', href: '/people/team' },
   { label: 'Practice', href: '/practice' },
+  { label: 'Contact', href: '/contact' },
   { label: 'Journal', href: '/journal' },
 ];
 
@@ -55,6 +56,7 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
     if (href === '/projects') return pathname.startsWith('/projects');
     if (href === '/people/team') return pathname.startsWith('/people');
     if (href === '/practice') return pathname.startsWith('/practice');
+    if (href === '/contact') return pathname.startsWith('/contact');
     if (href === '/journal') return pathname.startsWith('/journal');
     return pathname === href;
   };
