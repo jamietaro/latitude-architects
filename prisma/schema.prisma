@@ -78,14 +78,13 @@ model AdminUser {
 }
 
 model SiteSettings {
-  id              Int         @id @default(1)
-  heroTagline     String?     @default("Celebrating 25 years of crafting exceptional buildings across London and beyond.")
-  contactImageUrl String?
-  bannerImageUrl  String?
-  bannerTagline   String?     @default("Buildings for people.")
-  bannerCta       String?     @default("Get in touch")
-  updatedAt       DateTime    @updatedAt
-  heroSlides      HeroSlide[]
+  id             Int         @id @default(1)
+  heroTagline    String?     @default("Celebrating 25 years of crafting exceptional buildings across London and beyond.")
+  bannerImageUrl String?
+  bannerTagline  String?     @default("Buildings for people.")
+  bannerCta      String?     @default("Get in touch")
+  updatedAt      DateTime    @updatedAt
+  heroSlides     HeroSlide[]
 }
 
 model AboutBlock {
@@ -93,6 +92,36 @@ model AboutBlock {
   imageUrl String?
   tagline  String?
   body     String?
+}
+
+model TeamPageContent {
+  id      Int     @id @default(1)
+  heading String?
+  intro   String?
+}
+
+model ClientsPageContent {
+  id      Int     @id @default(1)
+  heading String?
+  intro   String?
+  body    String?
+}
+
+model CareersPageContent {
+  id        Int     @id @default(1)
+  heading   String?
+  intro     String?
+  vacancies String?
+}
+
+model ContactPageContent {
+  id       Int     @id @default(1)
+  heading  String?
+  address  String?
+  phone    String?
+  email    String?
+  body     String?
+  imageUrl String?
 }
 
 model HeroSlide {

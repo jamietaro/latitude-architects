@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import PracticeSubNav from '@/components/public/PracticeSubNav';
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Careers',
@@ -10,16 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/practice/careers' },
 };
 
-const vacancies = ['Architect', 'Part II Architectural Assistant'];
-
-export default function CareersPage() {
-  const secondaryText: React.CSSProperties = {
-    fontSize: 15,
-    fontWeight: 300,
-    color: '#999999',
-    lineHeight: 1.75,
-    margin: 0,
-  };
+export default async function CareersPage() {
+  const content = await prisma.careersPageContent.findUnique({ where: { id: 1 } });
 
   return (
     <main>
@@ -34,76 +29,80 @@ export default function CareersPage() {
             padding: '0 40px 120px',
           }}
         >
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 300,
-              color: '#111111',
-              margin: '0 0 40px',
-            }}
-          >
-            Careers
-          </h1>
+          {content?.heading && (
+            <h1
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                color: '#111111',
+                margin: '0 0 40px',
+              }}
+            >
+              {content.heading}
+            </h1>
+          )}
 
-          <p style={secondaryText}>
-            Collaboration is at the heart of what we do. At Latitude we are
-            committed to an inclusive and holistic approach to recruitment,
-            welcoming people from all backgrounds to join our team.
-          </p>
+          {content?.intro && (
+            <div
+              className="careers-intro"
+              style={{
+                fontSize: 15,
+                fontWeight: 300,
+                color: '#999999',
+                lineHeight: 1.75,
+                marginBottom: 64,
+              }}
+              dangerouslySetInnerHTML={{ __html: content.intro }}
+            />
+          )}
 
-          <div style={{ height: 24 }} />
-
-          <p style={secondaryText}>
-            If you are interested in working with us please send a CV, cover
-            letter, and 10-page portfolio to{' '}
-            <a href="mailto:design@latitudearchitects.com" className="careers-email">
-              design@latitudearchitects.com
-            </a>
-            .
-          </p>
-
-          <div style={{ height: 64 }} />
-
-          <p
-            style={{
-              fontSize: 12,
-              fontWeight: 400,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#111111',
-              margin: '0 0 24px',
-            }}
-          >
-            Current vacancies
-          </p>
-
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {vacancies.map((v) => (
-              <li
-                key={v}
+          {content?.vacancies && (
+            <>
+              <p
+                style={{
+                  fontSize: 12,
+                  fontWeight: 400,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: '#111111',
+                  margin: '0 0 24px',
+                }}
+              >
+                Current vacancies
+              </p>
+              <div
+                className="careers-vacancies"
                 style={{
                   fontSize: 15,
                   fontWeight: 400,
                   color: '#111111',
                   lineHeight: 2,
                 }}
-              >
-                {v}
-              </li>
-            ))}
-          </ul>
+                dangerouslySetInnerHTML={{ __html: content.vacancies }}
+              />
+            </>
+          )}
         </div>
       </div>
       <Footer />
 
       <style>{`
-        .careers-email {
+        .careers-intro > p {
+          margin: 0 0 24px;
+        }
+        .careers-intro > p:last-child {
+          margin-bottom: 0;
+        }
+        .careers-intro a {
           color: inherit;
           text-decoration: none;
           transition: text-decoration 0.15s ease;
         }
-        .careers-email:hover {
+        .careers-intro a:hover {
           text-decoration: underline;
+        }
+        .careers-vacancies > p {
+          margin: 0;
         }
       `}</style>
     </main>

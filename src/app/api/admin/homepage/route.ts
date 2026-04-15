@@ -39,7 +39,6 @@ export async function GET() {
       id: 1,
       heroTagline:
         "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
-      contactImageUrl: null,
       bannerImageUrl: null,
       bannerTagline: "Buildings for people.",
       bannerCta: "Get in touch",
@@ -56,7 +55,6 @@ export async function PUT(request: Request) {
   const body = await request.json();
   const {
     heroTagline,
-    contactImageUrl,
     bannerImageUrl,
     bannerTagline,
     bannerCta,
@@ -70,20 +68,18 @@ export async function PUT(request: Request) {
       heroTagline:
         heroTagline ??
         "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
-      contactImageUrl: contactImageUrl || null,
       bannerImageUrl: bannerImageUrl || null,
       bannerTagline: bannerTagline ?? "Buildings for people.",
       bannerCta: bannerCta ?? "Get in touch",
     },
     create: {
       id: 1,
-      heroTagline:
-        heroTagline ??
-        "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
-      contactImageUrl: contactImageUrl || null,
       bannerImageUrl: bannerImageUrl || null,
       bannerTagline: bannerTagline ?? "Buildings for people.",
       bannerCta: bannerCta ?? "Get in touch",
+      heroTagline:
+        heroTagline ??
+        "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
     },
   });
 

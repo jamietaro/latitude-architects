@@ -22,7 +22,6 @@ export default function HomepagePage() {
   const [heroTagline, setHeroTagline] = useState(
     "Celebrating 25 years of crafting exceptional buildings across London and beyond."
   );
-  const [contactImageUrl, setContactImageUrl] = useState<string | null>(null);
   const [bannerImageUrl, setBannerImageUrl] = useState<string | null>(null);
   const [bannerTagline, setBannerTagline] = useState("Buildings for people.");
   const [bannerCta, setBannerCta] = useState("Get in touch");
@@ -52,7 +51,6 @@ export default function HomepagePage() {
         data.heroTagline ??
           "Celebrating 25 years of crafting exceptional buildings across London and beyond."
       );
-      setContactImageUrl(data.contactImageUrl ?? null);
       setBannerImageUrl(data.bannerImageUrl ?? null);
       setBannerTagline(data.bannerTagline ?? "Buildings for people.");
       setBannerCta(data.bannerCta ?? "Get in touch");
@@ -85,7 +83,6 @@ export default function HomepagePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           heroTagline,
-          contactImageUrl,
           bannerImageUrl,
           bannerTagline,
           bannerCta,
@@ -264,14 +261,6 @@ export default function HomepagePage() {
               className="bg-[#28282c] border border-[#444] text-white text-sm px-3 py-2 w-full rounded outline-none focus:border-[#666] transition-colors resize-none"
             />
           </div>
-        </div>
-
-        <div className="max-w-[480px] pt-8 border-t border-[#2a2a2e]">
-          <label className={labelClass}>Contact Page Image</label>
-          <p className="text-[#666] text-xs mb-2">
-            Image displayed on the Practice &gt; Contact page
-          </p>
-          <ImageUpload value={contactImageUrl} onChange={setContactImageUrl} />
         </div>
 
         <div className="max-w-[480px] pt-8 border-t border-[#2a2a2e]">

@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import Nav from '@/components/public/Nav';
 import Footer from '@/components/public/Footer';
 import PracticeSubNav from '@/components/public/PracticeSubNav';
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Clients',
@@ -10,90 +13,82 @@ export const metadata: Metadata = {
   alternates: { canonical: '/practice/clients' },
 };
 
-const clients = [
-  'Aberdeen Asset Management Ltd',
-  'Ambassador Theatre Group',
-  'Cannon Capital Developments',
-  'Capital and City plc',
-  'Charles Church (SE) Ltd',
-  'Como Holdings Ltd',
-  'Create Reit Ltd',
-  'Derby Hotels Collection',
-  'Earthquake (UK) Ltd',
-  'Euro Properties Intl Ltd',
-  'GE Real Estate',
-  'Gracemark Investments Ltd',
-  'Grosvenor',
-  'Hermes Investment Management',
-  'Ipsus',
-  'M&M Asset Management Ltd',
-  'Maybrook Properties Ltd',
-  'National Trust',
-  'Oppenheim Immobilien',
-  'Persimmon Homes (SE) Ltd',
-  'PMB Holdings Ltd',
-  'REIT Asset Management',
-  'Soho Estates Ltd',
-  'Sydney and London Properties Ltd',
-  'Thames River Capital',
-  'The Portman Estate',
-  'Threadneedle Estates Ltd',
-  'UK Real Estate',
-  'United World Colleges',
-  'Walton Wagner Ltd',
-];
+export default async function ClientsPage() {
+  const content = await prisma.clientsPageContent.findUnique({ where: { id: 1 } });
 
-export default function ClientsPage() {
   return (
     <main>
       <Nav />
       <div style={{ paddingTop: 60 }}>
         <PracticeSubNav />
 
-        <p
-          style={{
-            maxWidth: 680,
-            margin: '0 auto',
-            padding: '0 40px',
-            fontSize: 22,
-            fontWeight: 300,
-            color: '#111111',
-            marginBottom: 40,
-          }}
-        >
-          25 years of strong client relationships.
-        </p>
-
         <div
-          className="clients-grid"
           style={{
             maxWidth: 680,
             margin: '0 auto',
             padding: '0 40px 80px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '0 32px',
           }}
         >
-          {clients.map((client) => (
-            <p
-              key={client}
+          {content?.heading && (
+            <h1
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                color: '#111111',
+                margin: '0 0 24px',
+              }}
+            >
+              {content.heading}
+            </h1>
+          )}
+
+          {content?.intro && (
+            <div
+              className="clients-intro"
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                color: '#111111',
+                marginBottom: 40,
+              }}
+              dangerouslySetInnerHTML={{ __html: content.intro }}
+            />
+          )}
+
+          {content?.body && (
+            <div
+              className="clients-body"
               style={{
                 fontSize: 14,
                 fontWeight: 300,
                 color: '#111111',
                 lineHeight: 2,
-                margin: 0,
               }}
-            >
-              {client}
-            </p>
-          ))}
+              dangerouslySetInnerHTML={{ __html: content.body }}
+            />
+          )}
         </div>
 
         <style>{`
+          .clients-intro > p {
+            margin: 0 0 16px;
+          }
+          .clients-intro > p:last-child {
+            margin-bottom: 0;
+          }
+          .clients-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0 32px;
+          }
+          .clients-body li {
+            margin: 0;
+          }
           @media (max-width: 639px) {
-            .clients-grid {
+            .clients-body ul {
               grid-template-columns: 1fr !important;
             }
           }

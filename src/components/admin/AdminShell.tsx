@@ -12,6 +12,9 @@ const navItems = [
   { label: "Journal", href: "/admin/news" },
   { label: "Team", href: "/admin/team" },
   { label: "Practice", href: "/admin/practice" },
+  { label: "Clients", href: "/admin/clients" },
+  { label: "Careers", href: "/admin/careers" },
+  { label: "Contact", href: "/admin/contact" },
   { label: "Settings", href: "/admin/settings" },
 ];
 

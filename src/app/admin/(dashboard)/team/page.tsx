@@ -176,6 +176,12 @@ export default function TeamPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="bg-[#28282c] border border-[#444] text-white text-sm h-9 px-3 rounded flex-1 outline-none focus:border-[#666]"
           />
+          <a
+            href="/admin/team-page"
+            className="text-[#888] text-xs hover:text-white whitespace-nowrap"
+          >
+            Edit page content →
+          </a>
         </div>
 
         <div className="flex-1 overflow-y-auto">

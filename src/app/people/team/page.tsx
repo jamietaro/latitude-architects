@@ -15,23 +15,26 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamPage() {
-  const members = await prisma.teamMember.findMany({
-    where: { published: true },
-    orderBy: { order: 'asc' },
-  });
+  const [members, pageContent] = await Promise.all([
+    prisma.teamMember.findMany({
+      where: { published: true },
+      orderBy: { order: 'asc' },
+    }),
+    prisma.teamPageContent.findUnique({ where: { id: 1 } }),
+  ]);
 
   return (
     <main>
       <Nav />
       <div style={{ paddingTop: 60 }}>
-        {/* Sub-nav */}
+        {/* Heading */}
         <nav
           style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             paddingTop: 48,
-            marginBottom: 48,
+            marginBottom: pageContent?.intro ? 32 : 48,
           }}
         >
           <span
@@ -43,36 +46,27 @@ export default async function TeamPage() {
               color: '#111111',
             }}
           >
-            TEAM
+            {(pageContent?.heading ?? 'Team').toUpperCase()}
           </span>
         </nav>
 
         {/* Intro */}
-        <div
-          style={{
-            maxWidth: 560,
-            margin: '0 auto',
-            padding: '0 40px',
-            textAlign: 'center',
-            marginBottom: 48,
-          }}
-        >
-          <p
+        {pageContent?.intro && (
+          <div
             style={{
+              maxWidth: 560,
+              margin: '0 auto',
+              padding: '0 40px',
+              textAlign: 'center',
+              marginBottom: 48,
               fontSize: 15,
               fontWeight: 300,
               lineHeight: 1.7,
               color: '#333333',
-              margin: 0,
             }}
-          >
-            {/* TODO: Practice to supply team introduction text */}
-            Our team brings together architects, designers and project managers with a
-            shared commitment to design quality and careful, considered practice. Working
-            collaboratively across all project stages, we bring rigour and creativity to
-            every commission.
-          </p>
-        </div>
+            dangerouslySetInnerHTML={{ __html: pageContent.intro }}
+          />
+        )}
 
         {/* Grid */}
         <div

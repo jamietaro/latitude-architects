@@ -14,10 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const settings = await prisma.siteSettings.findUnique({
-    where: { id: 1 },
-  });
-  const contactImage = settings?.contactImageUrl ?? null;
+  const content = await prisma.contactPageContent.findUnique({ where: { id: 1 } });
 
   return (
     <main>
@@ -37,54 +34,77 @@ export default async function ContactPage() {
         >
           {/* Left: Details */}
           <div>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 400,
-                color: "#111111",
-                margin: "0 0 12px",
-              }}
-            >
-              Latitude Architects and Designers Ltd
-            </p>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 300,
-                color: "#999999",
-                lineHeight: 1.9,
-                margin: 0,
-              }}
-            >
-              15 Weller Street
-              <br />
-              London, SE1 1QU
-            </p>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 300,
-                color: "#999999",
-                lineHeight: 1.9,
-                margin: "8px 0 0",
-              }}
-            >
-              +44 20 7234 0235
-            </p>
-            <p style={{ margin: "8px 0 0" }}>
-              <a
-                href="mailto:design@latitudearchitects.com"
+            {content?.heading && (
+              <p
+                style={{
+                  fontSize: 14,
+                  fontWeight: 400,
+                  color: "#111111",
+                  margin: "0 0 12px",
+                }}
+              >
+                {content.heading}
+              </p>
+            )}
+
+            {content?.address && (
+              <div
+                className="contact-address"
                 style={{
                   fontSize: 14,
                   fontWeight: 300,
-                  color: "#111111",
-                  textDecoration: "none",
-                  transition: "opacity 0.25s ease",
+                  color: "#999999",
+                  lineHeight: 1.9,
+                }}
+                dangerouslySetInnerHTML={{ __html: content.address }}
+              />
+            )}
+
+            {content?.phone && (
+              <p
+                style={{
+                  fontSize: 14,
+                  fontWeight: 300,
+                  color: "#999999",
+                  lineHeight: 1.9,
+                  margin: "8px 0 0",
                 }}
               >
-                design@latitudearchitects.com
-              </a>
-            </p>
+                {content.phone}
+              </p>
+            )}
+
+            {content?.email && (
+              <p style={{ margin: "8px 0 0" }}>
+                <a
+                  href={`mailto:${content.email}`}
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 300,
+                    color: "#111111",
+                    textDecoration: "none",
+                    transition: "opacity 0.25s ease",
+                  }}
+                >
+                  {content.email}
+                </a>
+              </p>
+            )}
+
+            {content?.body && (
+              <div
+                className="contact-body"
+                style={{
+                  marginTop: 16,
+                  fontSize: 14,
+                  fontWeight: 300,
+                  color: "#999999",
+                  lineHeight: 1.9,
+                }}
+                dangerouslySetInnerHTML={{ __html: content.body }}
+              />
+            )}
+
             <p style={{ margin: "12px 0 0" }}>
               <a
                 href="https://www.instagram.com/latitudearchitects/"
@@ -124,9 +144,9 @@ export default async function ContactPage() {
 
           {/* Right: Image from CMS */}
           <div>
-            {contactImage && (
+            {content?.imageUrl && (
               <FadeImage
-                src={contactImage}
+                src={content.imageUrl}
                 alt="Latitude Architects"
                 width={600}
                 height={400}
@@ -137,6 +157,15 @@ export default async function ContactPage() {
         </div>
 
         <style>{`
+          .contact-address p {
+            margin: 0;
+          }
+          .contact-body p {
+            margin: 0 0 8px;
+          }
+          .contact-body p:last-child {
+            margin-bottom: 0;
+          }
           @media (max-width: 639px) {
             .contact-grid {
               grid-template-columns: 1fr !important;
