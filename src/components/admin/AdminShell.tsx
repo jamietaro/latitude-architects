@@ -11,7 +11,7 @@ const navItems = [
   { label: "Order", href: "/admin/order" },
   { label: "Journal", href: "/admin/news" },
   { label: "Team", href: "/admin/team" },
-  { label: "Practice", href: "/admin/practice" },
+  { label: "About", href: "/admin/practice" },
   { label: "Clients", href: "/admin/clients" },
   { label: "Careers", href: "/admin/careers" },
   { label: "Contact", href: "/admin/contact" },
