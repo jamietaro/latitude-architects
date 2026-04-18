@@ -11,6 +11,7 @@ const navItems = [
   { label: "Order", href: "/admin/order" },
   { label: "Journal", href: "/admin/news" },
   { label: "Team", href: "/admin/team" },
+  { label: "Team Page", href: "/admin/team-page" },
   { label: "About", href: "/admin/practice" },
   { label: "Clients", href: "/admin/clients" },
   { label: "Careers", href: "/admin/careers" },
@@ -49,7 +50,7 @@ export default function AdminShell({
 
         <nav className="flex-1">
           {navItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
