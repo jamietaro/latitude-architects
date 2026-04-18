@@ -61,16 +61,28 @@ model ProjectCategoryOrder {
 }
 
 model NewsPost {
-  id        Int      @id @default(autoincrement())
+  id        Int             @id @default(autoincrement())
   title     String
-  slug      String   @unique
+  slug      String          @unique
   date      DateTime
   category  String
   body      String
   image     String?
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  published Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  images    NewsPostImage[]
+}
+
+model NewsPostImage {
+  id     Int      @id @default(autoincrement())
+  postId Int
+  post   NewsPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url    String
+  alt    String?
+  order  Int      @default(0)
+
+  @@index([postId])
 }
 
 model TeamMember {

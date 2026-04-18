@@ -69,26 +69,21 @@ export default async function JournalPage() {
           </div>
 
           {/* Posts */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {posts.map((post: typeof posts[number]) => (
               <ScrollFadeIn key={post.id}>
                 <Link
                   href={`/journal/${post.slug}`}
                   className="no-underline block"
-                  style={{ transition: 'opacity 0.25s ease' }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 20,
+                    transition: 'opacity 0.25s ease',
+                  }}
                 >
-                  <div
-                    style={{
-                      width: '100%',
-                      maxHeight: 400,
-                      overflow: 'hidden',
-                      backgroundColor: '#f3f3f3',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {post.image && (
+                  {post.image && (
+                    <div style={{ width: 210, flexShrink: 0 }}>
                       <FadeImage
                         src={post.image}
                         alt={post.title}
@@ -98,37 +93,38 @@ export default async function JournalPage() {
                         style={{
                           width: '100%',
                           height: 'auto',
-                          maxHeight: 400,
-                          objectFit: 'contain',
+                          display: 'block',
                         }}
                       />
-                    )}
+                    </div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 300,
+                        color: '#111111',
+                        margin: 0,
+                      }}
+                    >
+                      {post.title}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 300,
+                        color: '#999999',
+                        margin: '4px 0 0',
+                      }}
+                    >
+                      {post.category} &mdash;{' '}
+                      {post.date.toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </p>
                   </div>
-                  <p
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 300,
-                      color: '#111111',
-                      margin: '14px 0 0',
-                    }}
-                  >
-                    {post.title}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 300,
-                      color: '#999999',
-                      margin: '4px 0 0',
-                    }}
-                  >
-                    {post.category} &mdash;{' '}
-                    {post.date.toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </p>
                 </Link>
               </ScrollFadeIn>
             ))}

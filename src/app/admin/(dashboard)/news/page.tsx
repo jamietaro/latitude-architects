@@ -4,11 +4,19 @@ import { useState, useEffect, useCallback } from "react";
 import slugify from "slugify";
 import dynamic from "next/dynamic";
 import ImageUpload from "@/components/admin/ImageUpload";
+import GalleryUpload, { GalleryImage } from "@/components/admin/GalleryUpload";
 
 const TiptapEditor = dynamic(
   () => import("@/components/admin/TiptapEditor"),
   { ssr: false }
 );
+
+interface NewsPostImage {
+  id?: number;
+  url: string;
+  alt: string;
+  order: number;
+}
 
 interface NewsPost {
   id: number;
@@ -19,6 +27,7 @@ interface NewsPost {
   body: string;
   image: string | null;
   published: boolean;
+  images?: NewsPostImage[];
 }
 
 const CATEGORIES = [
@@ -38,6 +47,7 @@ const emptyPost = {
   body: "",
   image: null as string | null,
   published: false,
+  images: [] as NewsPostImage[],
 };
 
 const inputClass =
@@ -74,6 +84,7 @@ export default function NewsPage() {
       body: post.body,
       image: post.image,
       published: post.published,
+      images: post.images ?? [],
     });
     setSaveStatus("");
     setMenuOpen(false);
@@ -323,6 +334,26 @@ export default function NewsPage() {
               <TiptapEditor
                 content={form.body}
                 onChange={(html) => updateField("body", html)}
+              />
+            </div>
+
+            <div className="pt-5 border-t border-[#2a2a2e]">
+              <label className={labelClass}>Gallery Images</label>
+              <p className="text-[#666] text-xs mb-2">
+                Additional images shown stacked below the post body.
+              </p>
+              <GalleryUpload
+                images={form.images}
+                onChange={(imgs: GalleryImage[]) =>
+                  updateField(
+                    "images",
+                    imgs.map((img, idx) => ({
+                      url: img.url,
+                      alt: img.alt,
+                      order: idx,
+                    }))
+                  )
+                }
               />
             </div>
           </div>

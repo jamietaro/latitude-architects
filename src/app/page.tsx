@@ -259,24 +259,13 @@ export default async function HomePage() {
                 className="no-underline block"
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   gap: 20,
                   transition: 'opacity 0.25s ease',
                 }}
               >
-                <div
-                  style={{
-                    width: 210,
-                    maxHeight: 140,
-                    flexShrink: 0,
-                    overflow: 'hidden',
-                    backgroundColor: '#f3f3f3',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  {post.image && (
+                {post.image && (
+                  <div style={{ width: 210, flexShrink: 0 }}>
                     <FadeImage
                       src={post.image}
                       alt={post.title}
@@ -286,12 +275,11 @@ export default async function HomePage() {
                       style={{
                         width: '100%',
                         height: 'auto',
-                        maxHeight: 140,
-                        objectFit: 'contain',
+                        display: 'block',
                       }}
                     />
-                  )}
-                </div>
+                  </div>
+                )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p
                     style={{

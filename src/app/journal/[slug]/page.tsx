@@ -44,6 +44,7 @@ export default async function JournalPostPage({
 
   const post = await prisma.newsPost.findUnique({
     where: { slug, published: true },
+    include: { images: { orderBy: { order: "asc" } } },
   });
 
   if (!post) notFound();
@@ -117,6 +118,33 @@ export default async function JournalPostPage({
               }}
               dangerouslySetInnerHTML={{ __html: post.body }}
             />
+          )}
+
+          {post.images.length > 0 && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                marginTop: 40,
+              }}
+            >
+              {post.images.map((img: typeof post.images[number]) => (
+                <FadeImage
+                  key={img.id}
+                  src={img.url}
+                  alt={img.alt ?? post.title}
+                  width={1360}
+                  height={900}
+                  loading="lazy"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                  }}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>

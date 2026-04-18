@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
   const posts = await prisma.newsPost.findMany({
     where: publishedOnly ? { published: true } : undefined,
     orderBy: { date: "desc" },
+    include: { images: { orderBy: { order: "asc" } } },
   });
 
   return NextResponse.json(posts);
@@ -22,7 +23,16 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { title, slug, date, category, body: postBody, image, published } = body;
+  const {
+    title,
+    slug,
+    date,
+    category,
+    body: postBody,
+    image,
+    published,
+    images,
+  } = body;
 
   const post = await prisma.newsPost.create({
     data: {
@@ -33,7 +43,17 @@ export async function POST(request: NextRequest) {
       body: postBody || "",
       image: image || null,
       published: published || false,
+      images: {
+        create: (images || []).map(
+          (img: { url: string; alt?: string; order?: number }, idx: number) => ({
+            url: img.url,
+            alt: img.alt || "",
+            order: img.order ?? idx,
+          })
+        ),
+      },
     },
+    include: { images: { orderBy: { order: "asc" } } },
   });
 
   return NextResponse.json(post, { status: 201 });

@@ -13,6 +13,7 @@ export async function GET(
 
   const post = await prisma.newsPost.findUnique({
     where: { id: parseInt(id) },
+    include: { images: { orderBy: { order: "asc" } } },
   });
 
   if (!post) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -28,11 +29,24 @@ export async function PUT(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+  const postId = parseInt(id);
   const body = await request.json();
-  const { title, slug, date, category, body: postBody, image, published } = body;
+  const {
+    title,
+    slug,
+    date,
+    category,
+    body: postBody,
+    image,
+    published,
+    images,
+  } = body;
 
-  const post = await prisma.newsPost.update({
-    where: { id: parseInt(id) },
+  // Replace gallery wholesale — simpler than upsert for an ordered list.
+  await prisma.newsPostImage.deleteMany({ where: { postId } });
+
+  await prisma.newsPost.update({
+    where: { id: postId },
     data: {
       title,
       slug,
@@ -41,10 +55,24 @@ export async function PUT(
       body: postBody || "",
       image: image || null,
       published: published || false,
+      images: {
+        create: (images || []).map(
+          (img: { url: string; alt?: string; order?: number }, idx: number) => ({
+            url: img.url,
+            alt: img.alt || "",
+            order: img.order ?? idx,
+          })
+        ),
+      },
     },
   });
 
-  return NextResponse.json(post);
+  const full = await prisma.newsPost.findUnique({
+    where: { id: postId },
+    include: { images: { orderBy: { order: "asc" } } },
+  });
+
+  return NextResponse.json(full);
 }
 
 export async function DELETE(
