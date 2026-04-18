@@ -45,6 +45,7 @@ export async function GET(
     include: {
       images: { orderBy: { order: "asc" } },
       categoryOrders: true,
+      teamMembers: { orderBy: { order: "asc" } },
     },
   });
 
@@ -75,11 +76,18 @@ export async function PUT(
     description,
     featured,
     published,
+    teamVisible,
     images,
+    teamMembers,
   } = body;
 
   // Delete existing images and recreate
   await prisma.projectImage.deleteMany({
+    where: { projectId },
+  });
+
+  // Replace team members wholesale
+  await prisma.projectTeamMember.deleteMany({
     where: { projectId },
   });
 
@@ -97,6 +105,7 @@ export async function PUT(
       description: description || "",
       featured: featured || false,
       published: published || false,
+      teamVisible: teamVisible ?? true,
       images: {
         create: (images || []).map(
           (img: { url: string; alt?: string; order?: number }, idx: number) => ({
@@ -105,6 +114,29 @@ export async function PUT(
             order: img.order ?? idx,
           })
         ),
+      },
+      teamMembers: {
+        create: (teamMembers || [])
+          .filter(
+            (m: { role?: string; name?: string }) =>
+              (m.role || "").trim() !== "" || (m.name || "").trim() !== ""
+          )
+          .map(
+            (
+              m: {
+                role?: string;
+                name?: string;
+                order?: number;
+                visible?: boolean;
+              },
+              idx: number
+            ) => ({
+              role: (m.role || "").trim(),
+              name: (m.name || "").trim(),
+              order: m.order ?? idx,
+              visible: m.visible ?? true,
+            })
+          ),
       },
     },
   });
@@ -130,6 +162,7 @@ export async function PUT(
     include: {
       images: { orderBy: { order: "asc" } },
       categoryOrders: true,
+      teamMembers: { orderBy: { order: "asc" } },
     },
   });
 

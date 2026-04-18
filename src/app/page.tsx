@@ -267,10 +267,13 @@ export default async function HomePage() {
                 <div
                   style={{
                     width: 210,
-                    aspectRatio: '3/2',
+                    maxHeight: 140,
                     flexShrink: 0,
                     overflow: 'hidden',
                     backgroundColor: '#f3f3f3',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                 >
                   {post.image && (
@@ -282,8 +285,9 @@ export default async function HomePage() {
                       loading="lazy"
                       style={{
                         width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
+                        height: 'auto',
+                        maxHeight: 140,
+                        objectFit: 'contain',
                       }}
                     />
                   )}

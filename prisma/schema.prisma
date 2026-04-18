@@ -19,11 +19,25 @@ model Project {
   description      String
   featured         Boolean                @default(false)
   published        Boolean                @default(false)
+  teamVisible      Boolean                @default(true)
   createdAt        DateTime               @default(now())
   updatedAt        DateTime               @updatedAt
   images           ProjectImage[]
   categoryOrders   ProjectCategoryOrder[]
   heroSlides       HeroSlide[]
+  teamMembers      ProjectTeamMember[]
+}
+
+model ProjectTeamMember {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role      String
+  name      String
+  order     Int     @default(0)
+  visible   Boolean @default(true)
+
+  @@index([projectId])
 }
 
 model ProjectImage {

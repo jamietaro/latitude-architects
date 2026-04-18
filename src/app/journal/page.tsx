@@ -80,9 +80,12 @@ export default async function JournalPage() {
                   <div
                     style={{
                       width: '100%',
-                      aspectRatio: '3/2',
+                      maxHeight: 400,
                       overflow: 'hidden',
                       backgroundColor: '#f3f3f3',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     }}
                   >
                     {post.image && (
@@ -94,8 +97,9 @@ export default async function JournalPage() {
                         loading="lazy"
                         style={{
                           width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
+                          height: 'auto',
+                          maxHeight: 400,
+                          objectFit: 'contain',
                         }}
                       />
                     )}

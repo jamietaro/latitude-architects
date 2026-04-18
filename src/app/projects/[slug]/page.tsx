@@ -56,10 +56,19 @@ export default async function ProjectDetailPage({
 
   const project = await prisma.project.findUnique({
     where: { slug, published: true },
-    include: { images: { orderBy: { order: "asc" } } },
+    include: {
+      images: { orderBy: { order: "asc" } },
+      teamMembers: {
+        where: { visible: true },
+        orderBy: { order: "asc" },
+      },
+    },
   });
 
   if (!project) notFound();
+
+  const showTeam =
+    project.teamVisible && project.teamMembers.length > 0;
 
   const metaParts = [
     project.sectors.split(",").join(" \u00b7 "),
@@ -115,6 +124,39 @@ export default async function ProjectDetailPage({
                 }}
                 dangerouslySetInnerHTML={{ __html: project.description }}
               />
+            )}
+
+            {showTeam && (
+              <div
+                style={{
+                  marginTop: 40,
+                  paddingTop: 24,
+                  borderTop: "1px solid #e8e6e2",
+                  fontFamily: '"DM Sans", sans-serif',
+                }}
+              >
+                {project.teamMembers.map((member) => (
+                  <div
+                    key={member.id}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.4fr)",
+                      columnGap: 16,
+                      padding: "10px 0",
+                      borderBottom: "1px solid #f0eeea",
+                      fontSize: 14,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    <span style={{ color: "#111111", fontWeight: 400 }}>
+                      {member.role}
+                    </span>
+                    <span style={{ color: "#999999", fontWeight: 300 }}>
+                      {member.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import {
   DndContext,
@@ -17,12 +17,16 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { fetchImageMeta, formatBytes, type ImageMeta } from "@/lib/imageInfo";
 
 export interface GalleryImage {
   id?: number;
   url: string;
   alt: string;
   order: number;
+  // Local-only metadata: present immediately after a fresh upload so we
+  // can show filename/size without a HEAD round-trip. Not persisted.
+  _localMeta?: ImageMeta;
 }
 
 interface GalleryUploadProps {
@@ -39,6 +43,22 @@ function SortableImage({
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: image.url });
+  const [fetched, setFetched] = useState<ImageMeta | null>(null);
+
+  useEffect(() => {
+    // Skip the network round-trip when fresh-upload metadata is already
+    // present on the image (extracted from the File object client-side).
+    if (image._localMeta) return;
+    let cancelled = false;
+    fetchImageMeta(image.url).then((m) => {
+      if (!cancelled) setFetched(m);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [image.url, image._localMeta]);
+
+  const meta = image._localMeta ?? fetched;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -72,6 +92,17 @@ function SortableImage({
       >
         &times;
       </button>
+      {meta && (
+        <div
+          className="text-[#888] text-[11px] mt-1 leading-tight"
+          style={{ width: 120 }}
+        >
+          <p className="truncate" title={meta.filename}>
+            {meta.filename}
+          </p>
+          {meta.sizeBytes != null && <p>{formatBytes(meta.sizeBytes)}</p>}
+        </div>
+      )}
     </div>
   );
 }
@@ -109,6 +140,7 @@ export default function GalleryUpload({
             url: data.url,
             alt: "",
             order: images.length + newImages.length,
+            _localMeta: { filename: file.name, sizeBytes: file.size },
           });
         } catch (err) {
           console.error("Upload error:", err);
@@ -156,7 +188,7 @@ export default function GalleryUpload({
           items={images.map((img) => img.url)}
           strategy={rectSortingStrategy}
         >
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {images.map((image, index) => (
               <SortableImage
                 key={image.url}

@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
     include: {
       images: { orderBy: { order: "asc" } },
       categoryOrders: true,
+      teamMembers: { orderBy: { order: "asc" } },
     },
     orderBy: { id: "asc" },
   });
@@ -67,7 +68,9 @@ export async function POST(request: NextRequest) {
     description,
     featured,
     published,
+    teamVisible,
     images,
+    teamMembers,
   } = body;
 
   const project = await prisma.project.create({
@@ -83,6 +86,7 @@ export async function POST(request: NextRequest) {
       description: description || "",
       featured: featured || false,
       published: published || false,
+      teamVisible: teamVisible ?? true,
       images: {
         create: (images || []).map(
           (img: { url: string; alt?: string; order?: number }, idx: number) => ({
@@ -91,6 +95,29 @@ export async function POST(request: NextRequest) {
             order: img.order ?? idx,
           })
         ),
+      },
+      teamMembers: {
+        create: (teamMembers || [])
+          .filter(
+            (m: { role?: string; name?: string }) =>
+              (m.role || "").trim() !== "" || (m.name || "").trim() !== ""
+          )
+          .map(
+            (
+              m: {
+                role?: string;
+                name?: string;
+                order?: number;
+                visible?: boolean;
+              },
+              idx: number
+            ) => ({
+              role: (m.role || "").trim(),
+              name: (m.name || "").trim(),
+              order: m.order ?? idx,
+              visible: m.visible ?? true,
+            })
+          ),
       },
     },
     include: { images: { orderBy: { order: "asc" } } },
@@ -106,6 +133,7 @@ export async function POST(request: NextRequest) {
     include: {
       images: { orderBy: { order: "asc" } },
       categoryOrders: true,
+      teamMembers: { orderBy: { order: "asc" } },
     },
   });
 

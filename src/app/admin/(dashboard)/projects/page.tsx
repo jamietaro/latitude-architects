@@ -5,6 +5,9 @@ import slugify from "slugify";
 import dynamic from "next/dynamic";
 import ImageUpload from "@/components/admin/ImageUpload";
 import GalleryUpload, { GalleryImage } from "@/components/admin/GalleryUpload";
+import ProjectTeamEditor, {
+  type ProjectTeamMemberDraft,
+} from "@/components/admin/ProjectTeamEditor";
 
 const TiptapEditor = dynamic(
   () => import("@/components/admin/TiptapEditor"),
@@ -16,6 +19,14 @@ interface ProjectImage {
   url: string;
   alt: string;
   order: number;
+}
+
+interface ProjectTeamMember {
+  id?: number;
+  role: string;
+  name: string;
+  order: number;
+  visible: boolean;
 }
 
 interface Project {
@@ -31,7 +42,9 @@ interface Project {
   description: string;
   featured: boolean;
   published: boolean;
+  teamVisible: boolean;
   images: ProjectImage[];
+  teamMembers?: ProjectTeamMember[];
 }
 
 const SECTORS = [
@@ -52,7 +65,11 @@ const STATUS_OPTIONS = [
   "In Design",
 ];
 
-const emptyProject: Omit<Project, "id"> = {
+interface ProjectFormState extends Omit<Project, "id" | "teamMembers"> {
+  teamMembers: ProjectTeamMemberDraft[];
+}
+
+const emptyProject: ProjectFormState = {
   title: "",
   slug: "",
   location: "",
@@ -64,8 +81,14 @@ const emptyProject: Omit<Project, "id"> = {
   description: "",
   featured: false,
   published: false,
+  teamVisible: true,
   images: [],
+  teamMembers: [],
 };
+
+function genKey() {
+  return `k-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
 const inputClass =
   "bg-[#28282c] border border-[#444] text-white text-sm h-11 px-3 w-full rounded outline-none focus:border-[#666] transition-colors";
@@ -74,7 +97,7 @@ const labelClass = "text-[#888] text-xs uppercase tracking-wider mb-1.5 block";
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selected, setSelected] = useState<Project | null>(null);
-  const [form, setForm] = useState<Omit<Project, "id">>(emptyProject);
+  const [form, setForm] = useState<ProjectFormState>(emptyProject);
   const [isNew, setIsNew] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
@@ -108,7 +131,16 @@ export default function ProjectsPage() {
       description: project.description,
       featured: project.featured,
       published: project.published,
+      teamVisible: project.teamVisible ?? true,
       images: project.images,
+      teamMembers: (project.teamMembers ?? []).map((m, idx) => ({
+        _key: m.id != null ? `id-${m.id}` : genKey(),
+        id: m.id,
+        role: m.role,
+        name: m.name,
+        order: m.order ?? idx,
+        visible: m.visible,
+      })),
     });
     setSaveStatus("");
     setMenuOpen(false);
@@ -481,6 +513,18 @@ export default function ProjectsPage() {
               <GalleryUpload
                 images={galleryImages}
                 onChange={setGalleryImages}
+              />
+            </div>
+
+            <div className="pt-5 border-t border-[#2a2a2e]">
+              <label className={labelClass}>Project Team</label>
+              <ProjectTeamEditor
+                teamVisible={form.teamVisible}
+                onTeamVisibleChange={(v) => updateField("teamVisible", v)}
+                members={form.teamMembers}
+                onMembersChange={(members) =>
+                  updateField("teamMembers", members)
+                }
               />
             </div>
 
