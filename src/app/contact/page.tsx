@@ -146,6 +146,23 @@ export default async function ContactPage() {
             <div style={{ width: "100%", aspectRatio: "1 / 1" }}>
               <MapBoxLoader />
             </div>
+            <a
+              className="contact-map-link"
+              href="https://www.google.com/maps/search/15+Weller+Street,+London+SE1+1QU"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-block",
+                marginTop: 12,
+                fontFamily: '"DM Sans", sans-serif',
+                fontSize: 13,
+                fontWeight: 300,
+                color: "#999999",
+                textDecoration: "none",
+              }}
+            >
+              Open in Google Maps
+            </a>
           </div>
         </div>
 
@@ -158,6 +175,9 @@ export default async function ContactPage() {
           }
           .contact-body p:last-child {
             margin-bottom: 0;
+          }
+          .contact-map-link:hover {
+            text-decoration: underline;
           }
           @media (max-width: 768px) {
             .contact-grid {
