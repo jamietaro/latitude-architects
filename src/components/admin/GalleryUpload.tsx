@@ -69,13 +69,31 @@ function SortableImage({
     <div
       ref={setNodeRef}
       style={style}
-      className="relative group inline-block"
+      className="inline-flex items-start gap-1"
     >
-      <div
+      <button
+        type="button"
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing"
+        aria-label="Drag to reorder"
+        className="flex items-center justify-center h-[90px] w-5 text-[#666] hover:text-white cursor-grab active:cursor-grabbing touch-none"
       >
+        <svg
+          width="10"
+          height="16"
+          viewBox="0 0 10 16"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <circle cx="2" cy="3" r="1.25" />
+          <circle cx="8" cy="3" r="1.25" />
+          <circle cx="2" cy="8" r="1.25" />
+          <circle cx="8" cy="8" r="1.25" />
+          <circle cx="2" cy="13" r="1.25" />
+          <circle cx="8" cy="13" r="1.25" />
+        </svg>
+      </button>
+      <div className="relative group inline-block">
         <Image
           src={image.url}
           alt={image.alt || "Gallery image"}
@@ -84,25 +102,25 @@ function SortableImage({
           className="rounded object-cover"
           style={{ width: 120, height: 90 }}
         />
-      </div>
-      <button
-        type="button"
-        onClick={onRemove}
-        className="absolute top-1 right-1 w-5 h-5 bg-black/70 text-white rounded-full text-xs items-center justify-center hover:bg-black cursor-pointer hidden group-hover:flex"
-      >
-        &times;
-      </button>
-      {meta && (
-        <div
-          className="text-[#888] text-[11px] mt-1 leading-tight"
-          style={{ width: 120 }}
+        <button
+          type="button"
+          onClick={onRemove}
+          className="absolute top-1 right-1 w-5 h-5 bg-black/70 text-white rounded-full text-xs items-center justify-center hover:bg-black cursor-pointer hidden group-hover:flex"
         >
-          <p className="truncate" title={meta.filename}>
-            {meta.filename}
-          </p>
-          {meta.sizeBytes != null && <p>{formatBytes(meta.sizeBytes)}</p>}
-        </div>
-      )}
+          &times;
+        </button>
+        {meta && (
+          <div
+            className="text-[#888] text-[11px] mt-1 leading-tight"
+            style={{ width: 120 }}
+          >
+            <p className="truncate" title={meta.filename}>
+              {meta.filename}
+            </p>
+            {meta.sizeBytes != null && <p>{formatBytes(meta.sizeBytes)}</p>}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
