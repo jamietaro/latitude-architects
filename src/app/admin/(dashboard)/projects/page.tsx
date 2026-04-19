@@ -65,7 +65,10 @@ const STATUS_OPTIONS = [
   "In Design",
 ];
 
-interface ProjectFormState extends Omit<Project, "id" | "teamMembers"> {
+interface ProjectFormState
+  extends Omit<Project, "id" | "teamMembers" | "images"> {
+  primaryImage: ProjectImage | null;
+  galleryImages: ProjectImage[];
   teamMembers: ProjectTeamMemberDraft[];
 }
 
@@ -82,7 +85,8 @@ const emptyProject: ProjectFormState = {
   featured: false,
   published: false,
   teamVisible: true,
-  images: [],
+  primaryImage: null,
+  galleryImages: [],
   teamMembers: [],
 };
 
@@ -119,6 +123,10 @@ export default function ProjectsPage() {
   function selectProject(project: Project) {
     setSelected(project);
     setIsNew(false);
+    const sorted = [...(project.images ?? [])].sort(
+      (a, b) => a.order - b.order
+    );
+    const [first, ...rest] = sorted;
     setForm({
       title: project.title,
       slug: project.slug,
@@ -132,7 +140,8 @@ export default function ProjectsPage() {
       featured: project.featured,
       published: project.published,
       teamVisible: project.teamVisible ?? true,
-      images: project.images,
+      primaryImage: first ?? null,
+      galleryImages: rest,
       teamMembers: (project.teamMembers ?? []).map((m, idx) => ({
         _key: m.id != null ? `id-${m.id}` : genKey(),
         id: m.id,
@@ -172,31 +181,37 @@ export default function ProjectsPage() {
     updateField("sectors", updated.join(","));
   }
 
-  // Main image = first image in the images array
-  const mainImage = form.images.length > 0 ? form.images[0]?.url : null;
+  // Primary image and gallery are independent fields. Removing the primary
+  // clears only the primary slot; gallery images are never promoted into it.
+  const mainImage = form.primaryImage?.url ?? null;
 
   function setMainImage(url: string | null) {
     if (!url) {
-      // Remove first image
-      updateField("images", form.images.slice(1));
-    } else {
-      const existing = form.images.length > 0 ? [...form.images] : [];
-      if (existing.length > 0) {
-        existing[0] = { ...existing[0], url, order: 0 };
-      } else {
-        existing.unshift({ url, alt: "", order: 0 });
-      }
-      updateField("images", existing);
+      updateField("primaryImage", null);
+      return;
     }
+    const existing = form.primaryImage;
+    updateField(
+      "primaryImage",
+      existing ? { ...existing, url, order: 0 } : { url, alt: "", order: 0 }
+    );
   }
 
-  // Gallery images = all images after the first
-  const galleryImages = form.images.length > 1 ? form.images.slice(1) : [];
+  const galleryImages = form.galleryImages;
 
   function setGalleryImages(imgs: GalleryImage[]) {
-    const main = form.images.length > 0 ? [form.images[0]] : [];
-    const reordered = imgs.map((img, idx) => ({ ...img, order: idx + 1 }));
-    updateField("images", [...main, ...reordered]);
+    updateField(
+      "galleryImages",
+      imgs.map((img, idx) => ({ ...img, order: idx + 1 }))
+    );
+  }
+
+  function buildSavePayload() {
+    const { primaryImage, galleryImages, ...rest } = form;
+    const images = primaryImage
+      ? [{ ...primaryImage, order: 0 }, ...galleryImages]
+      : galleryImages;
+    return { ...rest, images };
   }
 
   async function handleSave() {
@@ -208,7 +223,7 @@ export default function ProjectsPage() {
         const res = await fetch("/api/admin/projects", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(buildSavePayload()),
         });
         if (res.ok) {
           const created = await res.json();
@@ -223,7 +238,7 @@ export default function ProjectsPage() {
         const res = await fetch(`/api/admin/projects/${selected.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(buildSavePayload()),
         });
         if (res.ok) {
           const updated = await res.json();
