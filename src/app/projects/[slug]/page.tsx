@@ -191,15 +191,36 @@ export default async function ProjectDetailPage({
 
       <style>{`
         .project-layout {
-          display: grid;
-          grid-template-columns: 2fr 3fr;
+          display: flex;
+          align-items: flex-start;
           gap: 64px;
-          align-items: start;
+        }
+        .project-text {
+          flex: 2 1 0;
+          min-width: 0;
+        }
+        .project-images {
+          flex: 3 1 0;
+          min-width: 0;
+        }
+        @media (min-width: 1024px) {
+          .project-text {
+            position: sticky;
+            top: 60px;
+            align-self: flex-start;
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+          }
         }
         @media (max-width: 768px) {
           .project-layout {
-            grid-template-columns: 1fr;
+            flex-direction: column;
+            align-items: stretch;
             gap: 32px;
+          }
+          .project-text,
+          .project-images {
+            flex: 0 0 auto;
           }
           .project-images {
             order: -1;
