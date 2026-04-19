@@ -42,3 +42,7 @@ next-env.d.ts
 
 # local image library — not used by the app, upload via CMS instead
 /images/
+
+# image compression workspace — drop-in files and generated output
+images-to-compress/*
+!images-to-compress/README.md

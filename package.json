@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "npx tsx prisma/seed.ts",
+    "compress": "node scripts/compress-images.js",
     "postinstall": "prisma generate"
   },
   "dependencies": {
