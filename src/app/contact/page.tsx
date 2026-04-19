@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import FadeImage from "@/components/public/FadeImage";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
+import MapBoxLoader from "@/components/public/MapBoxLoader";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -23,17 +23,16 @@ export default async function ContactPage() {
         <div
           className="contact-grid"
           style={{
-            maxWidth: 680,
+            maxWidth: 1280,
             margin: "0 auto",
-            marginTop: 80,
-            padding: "0 40px 80px",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 48,
+            padding: "48px 40px 80px",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 64,
           }}
         >
           {/* Left: Details */}
-          <div>
+          <div className="contact-text" style={{ flex: "2 1 0", minWidth: 0 }}>
             {content?.heading && (
               <p
                 style={{
@@ -142,17 +141,11 @@ export default async function ContactPage() {
             </p>
           </div>
 
-          {/* Right: Image from CMS */}
-          <div>
-            {content?.imageUrl && (
-              <FadeImage
-                src={content.imageUrl}
-                alt="Latitude Architects"
-                width={600}
-                height={400}
-                style={{ width: "100%", height: "auto" }}
-              />
-            )}
+          {/* Right: Map */}
+          <div className="contact-map" style={{ flex: "3 1 0", minWidth: 0 }}>
+            <div style={{ width: "100%", aspectRatio: "1 / 1" }}>
+              <MapBoxLoader />
+            </div>
           </div>
         </div>
 
@@ -166,9 +159,15 @@ export default async function ContactPage() {
           .contact-body p:last-child {
             margin-bottom: 0;
           }
-          @media (max-width: 639px) {
+          @media (max-width: 768px) {
             .contact-grid {
-              grid-template-columns: 1fr !important;
+              flex-direction: column !important;
+              align-items: stretch !important;
+              gap: 32px !important;
+            }
+            .contact-text,
+            .contact-map {
+              flex: 0 0 auto !important;
             }
           }
         `}</style>
