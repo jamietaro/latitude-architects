@@ -6,6 +6,7 @@ const INPUT_DIR = path.join(__dirname, "..", "images-to-compress");
 const OUTPUT_DIR = path.join(INPUT_DIR, "compressed");
 const MAX_WIDTH = 2400;
 const JPEG_QUALITY = 82;
+const SKIP_BELOW_BYTES = 1024 * 1024;
 const EXTS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 
 function formatBytes(bytes) {
@@ -34,12 +35,21 @@ async function main() {
   }
 
   let processed = 0;
+  let skipped = 0;
   for (const name of files) {
     const srcPath = path.join(INPUT_DIR, name);
     const base = path.basename(name, path.extname(name));
     const destPath = path.join(OUTPUT_DIR, `${base}.jpg`);
 
     const srcSize = fs.statSync(srcPath).size;
+
+    if (srcSize < SKIP_BELOW_BYTES) {
+      console.log(
+        `${name}  ${formatBytes(srcSize)}  — skipped (already under 1 MB)`
+      );
+      skipped++;
+      continue;
+    }
 
     try {
       await sharp(srcPath)
@@ -61,7 +71,9 @@ async function main() {
     processed++;
   }
 
-  console.log(`\nProcessed ${processed}/${files.length} image(s).`);
+  console.log(
+    `\nProcessed ${processed}/${files.length} image(s). Skipped ${skipped}.`
+  );
 }
 
 main().catch((err) => {
