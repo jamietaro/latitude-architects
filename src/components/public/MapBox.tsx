@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const OFFICE: [number, number] = [-0.0994, 51.5011];
+const OFFICE: [number, number] = [-0.09886, 51.50178];
 
 export default function MapBox() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -35,6 +35,10 @@ export default function MapBox() {
     new mapboxgl.Marker({ element: markerEl, anchor: "center" })
       .setLngLat(OFFICE)
       .addTo(map);
+
+    map.on("load", () => {
+      map.addControl(new mapboxgl.NavigationControl(), "top-right");
+    });
 
     return () => {
       map.remove();
