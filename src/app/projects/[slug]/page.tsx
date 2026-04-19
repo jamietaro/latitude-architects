@@ -206,7 +206,7 @@ export default async function ProjectDetailPage({
         @media (min-width: 1024px) {
           .project-text {
             position: sticky;
-            top: 48px;
+            top: 108px;
             align-self: flex-start;
             max-height: calc(100vh - 60px);
             overflow-y: auto;
