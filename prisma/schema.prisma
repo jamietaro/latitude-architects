@@ -17,6 +17,7 @@ model Project {
   sectors          String
   shortDescription String?
   description      String
+  latitude         String?
   featured         Boolean                @default(false)
   published        Boolean                @default(false)
   teamVisible      Boolean                @default(true)

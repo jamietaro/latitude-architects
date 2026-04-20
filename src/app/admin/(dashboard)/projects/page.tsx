@@ -40,6 +40,7 @@ interface Project {
   sectors: string;
   shortDescription: string | null;
   description: string;
+  latitude: string | null;
   featured: boolean;
   published: boolean;
   teamVisible: boolean;
@@ -82,6 +83,7 @@ const emptyProject: ProjectFormState = {
   sectors: "",
   shortDescription: "",
   description: "",
+  latitude: "",
   featured: false,
   published: false,
   teamVisible: true,
@@ -137,6 +139,7 @@ export default function ProjectsPage() {
       sectors: project.sectors,
       shortDescription: project.shortDescription || "",
       description: project.description,
+      latitude: project.latitude || "",
       featured: project.featured,
       published: project.published,
       teamVisible: project.teamVisible ?? true,
@@ -442,6 +445,17 @@ export default function ProjectsPage() {
                 type="text"
                 value={form.location}
                 onChange={(e) => updateField("location", e.target.value)}
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>Latitude</label>
+              <input
+                type="text"
+                value={form.latitude || ""}
+                onChange={(e) => updateField("latitude", e.target.value)}
+                placeholder={`51°29'46.0"N`}
                 className={inputClass}
               />
             </div>

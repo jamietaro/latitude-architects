@@ -113,6 +113,29 @@ export default async function ProjectDetailPage({
               {metaLine}
             </p>
 
+            {project.latitude && (
+              <p style={{ margin: "6px 0 0" }}>
+                <a
+                  href={`https://www.google.com/maps/search/${encodeURIComponent(
+                    [project.title, project.location]
+                      .filter(Boolean)
+                      .join(" ")
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 300,
+                    color: "#999999",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {project.latitude}
+                </a>
+              </p>
+            )}
+
             {project.description && (
               <div
                 style={{
