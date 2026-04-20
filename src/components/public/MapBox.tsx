@@ -20,7 +20,7 @@ export default function MapBox() {
       container: containerRef.current,
       style: "mapbox://styles/mapbox/light-v11",
       center: OFFICE,
-      zoom: 15,
+      zoom: 13,
       scrollZoom: false,
     });
     mapRef.current = map;
