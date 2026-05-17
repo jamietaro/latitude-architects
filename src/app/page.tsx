@@ -118,7 +118,7 @@ export default async function HomePage() {
   return (
     <main>
       <StructuredData data={homepageStructuredData} />
-      <Nav transparent={true} darkBackground={heroSlides.length > 0} />
+      <Nav transparent={true} />
 
       <HeroSection slides={heroSlides} />
 

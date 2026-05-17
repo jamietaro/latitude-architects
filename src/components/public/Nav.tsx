@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 
 interface NavProps {
   transparent?: boolean;
-  darkBackground?: boolean;
 }
 
 const navLinks = [
@@ -18,7 +17,7 @@ const navLinks = [
   { label: 'Journal', href: '/journal' },
 ];
 
-export default function Nav({ transparent = false, darkBackground = false }: NavProps) {
+export default function Nav({ transparent = false }: NavProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
@@ -50,7 +49,6 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
   }, [pathname]);
 
   const isTransparentMode = transparent && !mobileOpen;
-  const showDualLogos = isTransparentMode && darkBackground;
 
   const isActive = (href: string) => {
     if (href === '/projects') return pathname.startsWith('/projects');
@@ -88,36 +86,15 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
           }}
         >
           <Link href="/" className="nav-logo-link">
-            {showDualLogos ? (
-              <>
-                <Image
-                  src="/images/logo-white.png"
-                  alt="Latitude Architects"
-                  width={200}
-                  height={32}
-                  className="nav-logo nav-logo-white no-fade"
-                  priority
-                />
-                <Image
-                  src="/images/logo-dark.png"
-                  alt="Latitude Architects"
-                  width={200}
-                  height={32}
-                  className="nav-logo nav-logo-dark no-fade"
-                  priority
-                />
-              </>
-            ) : (
-              <Image
-                src="/images/logo-dark.png"
-                alt="Latitude Architects"
-                width={200}
-                height={32}
-                className="no-fade"
-                style={{ height: 32, width: 'auto' }}
-                priority
-              />
-            )}
+            <Image
+              src="/images/logo-dark.png"
+              alt="Latitude Architects"
+              width={200}
+              height={32}
+              className={isTransparentMode ? 'nav-logo nav-logo-dark no-fade' : 'no-fade'}
+              style={{ height: 32, width: 'auto' }}
+              priority
+            />
           </Link>
 
           <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 60 }}>
@@ -229,10 +206,9 @@ export default function Nav({ transparent = false, darkBackground = false }: Nav
         .nav-logo-link:hover { opacity: 0.6; }
         .nav-logo { height: 32px !important; width: auto !important; }
 
-        .nav-logo-white { display: block; }
-        .nav-logo-dark { display: none; }
-        .site-nav[data-scrolled="true"] .nav-logo-white { display: none; }
-        .site-nav[data-scrolled="true"] .nav-logo-dark { display: block; }
+        /* Hide nav logo over hero; fade it in when scrolled to solid state */
+        .site-nav-transparent .nav-logo-dark { opacity: 0; transition: opacity 0.3s ease; }
+        .site-nav-transparent[data-scrolled="true"] .nav-logo-dark { opacity: 1; }
 
         /* === Nav links === */
         .nav-link {

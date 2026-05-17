@@ -173,7 +173,7 @@ export default function HeroSection({ slides }: { slides: HeroSlideData[] }) {
             </p>
           </Link>
         )}
-        <div style={{ height: 32 }} />
+        <div style={{ height: 16 }} />
         <p
           style={{
             fontSize: 10,
