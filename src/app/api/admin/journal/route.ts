@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const publishedOnly = searchParams.get("published") === "true";
 
-  const posts = await prisma.newsItem.findMany({
+  const posts = await prisma.newsPost.findMany({
     where: publishedOnly ? { published: true } : undefined,
     orderBy: { date: "desc" },
     include: { images: { orderBy: { order: "asc" } } },
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     images,
   } = body;
 
-  const post = await prisma.newsItem.create({
+  const post = await prisma.newsPost.create({
     data: {
       title,
       slug,

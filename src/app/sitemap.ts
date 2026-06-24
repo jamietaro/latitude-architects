@@ -6,7 +6,7 @@ const BASE_URL = 'https://latitudearchitects.com';
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [projects, team, posts] = await Promise.all([
+  const [projects, team, posts, newsItems] = await Promise.all([
     prisma.project.findMany({
       where: { published: true },
       select: { slug: true, updatedAt: true },
@@ -16,6 +16,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true },
     }),
     prisma.newsPost.findMany({
+      where: { published: true },
+      select: { slug: true, updatedAt: true },
+    }),
+    prisma.newsItem.findMany({
       where: { published: true },
       select: { slug: true, updatedAt: true },
     }),
@@ -67,6 +71,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     {
+      url: `${BASE_URL}/news`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
       url: `${BASE_URL}/journal`,
       lastModified: now,
       changeFrequency: 'weekly',
@@ -107,5 +117,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticRoutes, ...projectRoutes, ...teamRoutes, ...postRoutes];
+  const newsRoutes: MetadataRoute.Sitemap = newsItems.map((post) => ({
+    url: `${BASE_URL}/news/${post.slug}`,
+    lastModified: post.updatedAt,
+    changeFrequency: 'monthly',
+    priority: 0.5,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...projectRoutes,
+    ...teamRoutes,
+    ...postRoutes,
+    ...newsRoutes,
+  ];
 }

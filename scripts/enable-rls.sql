@@ -27,6 +27,14 @@ ALTER TABLE "NewsPostImage" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "service_role_full_access" ON "NewsPostImage"
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
+ALTER TABLE "NewsItem" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "service_role_full_access" ON "NewsItem"
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+ALTER TABLE "NewsItemImage" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "service_role_full_access" ON "NewsItemImage"
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+
 ALTER TABLE "TeamMember" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "service_role_full_access" ON "TeamMember"
   FOR ALL TO service_role USING (true) WITH CHECK (true);

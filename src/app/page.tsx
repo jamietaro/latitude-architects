@@ -5,6 +5,8 @@ import Footer from '@/components/public/Footer';
 import ScrollFadeIn from '@/components/public/ScrollFadeIn';
 import HeroSection, { type HeroSlideData } from '@/components/public/HeroSection';
 import FadeImage from '@/components/public/FadeImage';
+import SectionTitle from '@/components/public/SectionTitle';
+import CardCarousel, { type CarouselEntry } from '@/components/public/CardCarousel';
 import StructuredData from '@/components/StructuredData';
 import { prisma } from '@/lib/prisma';
 import { FEATURED_CATEGORY } from '@/lib/categories';
@@ -46,7 +48,19 @@ const homepageStructuredData = {
 };
 
 export default async function HomePage() {
-  const [allFeatured, recentNews, siteSettings] = await Promise.all([
+  // NOTE: NewsItem backs the "News" section; NewsPost backs the "Journal"
+  // section (legacy model name). They are fully independent.
+  const carouselSelect = {
+    id: true,
+    slug: true,
+    title: true,
+    category: true,
+    date: true,
+    image: true,
+  } as const;
+
+  const [allFeatured, newsEntries, journalEntries, siteSettings] =
+    await Promise.all([
     prisma.project.findMany({
       where: { published: true, featured: true },
       include: {
@@ -54,10 +68,17 @@ export default async function HomePage() {
         categoryOrders: true,
       },
     }),
+    prisma.newsItem.findMany({
+      where: { published: true },
+      orderBy: { date: 'desc' },
+      take: 12,
+      select: carouselSelect,
+    }),
     prisma.newsPost.findMany({
       where: { published: true },
       orderBy: { date: 'desc' },
-      take: 2,
+      take: 12,
+      select: carouselSelect,
     }),
     prisma.siteSettings.findUnique({
       where: { id: 1 },
@@ -100,6 +121,28 @@ export default async function HomePage() {
   const bannerTagline = siteSettings?.bannerTagline ?? 'Buildings for people.';
   const bannerCta = siteSettings?.bannerCta ?? 'Get in touch';
 
+  const toCarouselEntries = (
+    rows: {
+      id: number;
+      slug: string;
+      title: string;
+      category: string;
+      date: Date;
+      image: string | null;
+    }[]
+  ): CarouselEntry[] =>
+    rows.map((r) => ({
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      category: r.category,
+      date: r.date.toISOString(),
+      image: r.image,
+    }));
+
+  const newsCarousel = toCarouselEntries(newsEntries);
+  const journalCarousel = toCarouselEntries(journalEntries);
+
   const heroSlides: HeroSlideData[] = (siteSettings?.heroSlides ?? []).map(
     (s) => ({
       id: s.id,
@@ -138,27 +181,7 @@ export default async function HomePage() {
       </p>
 
       {/* Projects Header */}
-      <div
-        style={{
-          maxWidth: 1280,
-          margin: '0 auto',
-          padding: '0 40px 48px',
-          textAlign: 'center',
-        }}
-      >
-        <p
-          style={{
-            fontSize: 12,
-            fontWeight: 400,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            color: '#111111',
-            margin: 0,
-          }}
-        >
-          FEATURED PROJECTS
-        </p>
-      </div>
+      <SectionTitle>FEATURED PROJECTS</SectionTitle>
 
       {/* Featured Projects Grid */}
       {featuredProjects.length > 0 && (
@@ -236,81 +259,34 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* News Strip */}
-      {recentNews.length > 0 && (
-        <section
-          style={{
-            maxWidth: 640,
-            margin: '0 auto',
-            padding: '40px 40px 80px',
-          }}
-        >
-          {recentNews.map((post, i) => (
-            <div
-              key={post.id}
-              style={{
-                borderTop: i === 0 ? '1px solid #e8e6e2' : 'none',
-                borderBottom: '1px solid #e8e6e2',
-                padding: '20px 0',
-              }}
-            >
-              <Link
-                href={`/journal/${post.slug}`}
-                className="no-underline block"
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 20,
-                  transition: 'opacity 0.25s ease',
-                }}
-              >
-                {post.image && (
-                  <div style={{ width: 210, flexShrink: 0 }}>
-                    <FadeImage
-                      src={post.image}
-                      alt={post.title}
-                      width={600}
-                      height={400}
-                      loading="lazy"
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        display: 'block',
-                      }}
-                    />
-                  </div>
-                )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 300,
-                      color: '#999999',
-                      margin: 0,
-                    }}
-                  >
-                    {post.category} &mdash;{' '}
-                    {post.date.toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 300,
-                      color: '#111111',
-                      margin: '4px 0 0',
-                    }}
-                  >
-                    {post.title}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </section>
+      {/*
+        NEWS and JOURNAL carousel sections.
+        To swap their order, move the entire {/* === JOURNAL === *​/} block
+        above the {/* === NEWS === *​/} block (they are independent siblings).
+      */}
+
+      {/* === NEWS === */}
+      {newsCarousel.length > 0 && (
+        <>
+          <SectionTitle>NEWS</SectionTitle>
+          <section
+            style={{ maxWidth: 1280, margin: '0 auto', padding: '0 40px 80px' }}
+          >
+            <CardCarousel entries={newsCarousel} basePath="/news" />
+          </section>
+        </>
+      )}
+
+      {/* === JOURNAL === */}
+      {journalCarousel.length > 0 && (
+        <>
+          <SectionTitle>JOURNAL</SectionTitle>
+          <section
+            style={{ maxWidth: 1280, margin: '0 auto', padding: '0 40px 80px' }}
+          >
+            <CardCarousel entries={journalCarousel} basePath="/journal" />
+          </section>
+        </>
       )}
 
       {/* Banner */}

@@ -86,6 +86,35 @@ model NewsPostImage {
   @@index([postId])
 }
 
+// NOTE ON NAMING: the model above (NewsPost) backs the public *Journal*
+// section (/journal). The model below (NewsItem) backs the separate, newer
+// public *News* section (/news). The two are fully independent — same shape,
+// separate content — and must not be merged.
+model NewsItem {
+  id        Int             @id @default(autoincrement())
+  title     String
+  slug      String          @unique
+  date      DateTime
+  category  String
+  body      String
+  image     String?
+  published Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  images    NewsItemImage[]
+}
+
+model NewsItemImage {
+  id     Int      @id @default(autoincrement())
+  postId Int
+  post   NewsItem @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url    String
+  alt    String?
+  order  Int      @default(0)
+
+  @@index([postId])
+}
+
 model TeamMember {
   id        Int      @id @default(autoincrement())
   name      String

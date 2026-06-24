@@ -11,7 +11,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const post = await prisma.newsItem.findUnique({
+  const post = await prisma.newsPost.findUnique({
     where: { id: parseInt(id) },
     include: { images: { orderBy: { order: "asc" } } },
   });
@@ -43,9 +43,9 @@ export async function PUT(
   } = body;
 
   // Replace gallery wholesale — simpler than upsert for an ordered list.
-  await prisma.newsItemImage.deleteMany({ where: { postId } });
+  await prisma.newsPostImage.deleteMany({ where: { postId } });
 
-  await prisma.newsItem.update({
+  await prisma.newsPost.update({
     where: { id: postId },
     data: {
       title,
@@ -67,7 +67,7 @@ export async function PUT(
     },
   });
 
-  const full = await prisma.newsItem.findUnique({
+  const full = await prisma.newsPost.findUnique({
     where: { id: postId },
     include: { images: { orderBy: { order: "asc" } } },
   });
@@ -84,7 +84,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  await prisma.newsItem.delete({
+  await prisma.newsPost.delete({
     where: { id: parseInt(id) },
   });
 
