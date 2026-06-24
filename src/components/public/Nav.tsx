@@ -13,9 +13,9 @@ const navLinks = [
   { label: 'Projects', href: '/projects' },
   { label: 'People', href: '/people/team' },
   { label: 'Practice', href: '/practice' },
-  { label: 'Contact', href: '/contact' },
   { label: 'News', href: '/news' },
   { label: 'Journal', href: '/journal' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export default function Nav({ transparent = false }: NavProps) {
