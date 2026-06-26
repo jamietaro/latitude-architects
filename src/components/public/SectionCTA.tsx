@@ -19,11 +19,11 @@ export default function SectionCTA({
           display: 'inline-flex',
           alignItems: 'center',
           gap: 8,
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: 300,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
-          color: '#111111',
+          color: '#999999',
           textDecoration: 'none',
           transition: 'opacity 0.25s ease',
         }}

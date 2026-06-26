@@ -60,7 +60,15 @@ export default async function NewsPage() {
                   }}
                 >
                   {post.image && (
-                    <div style={{ width: 210, flexShrink: 0 }}>
+                    <div
+                      style={{
+                        width: 210,
+                        aspectRatio: '4/3',
+                        flexShrink: 0,
+                        overflow: 'hidden',
+                        backgroundColor: '#f3f3f3',
+                      }}
+                    >
                       <FadeImage
                         src={post.image}
                         alt={post.title}
@@ -69,7 +77,8 @@ export default async function NewsPage() {
                         loading="lazy"
                         style={{
                           width: '100%',
-                          height: 'auto',
+                          height: '100%',
+                          objectFit: 'cover',
                           display: 'block',
                         }}
                       />
