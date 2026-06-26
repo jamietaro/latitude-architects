@@ -39,34 +39,11 @@ export default async function JournalPage() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               color: '#aaaaaa',
-              margin: '0 0 16px',
+              margin: '0 0 40px',
             }}
           >
             JOURNAL
           </p>
-
-          {/* Filter links */}
-          <div style={{ display: 'flex', gap: 16, marginBottom: 40 }}>
-            <span
-              style={{
-                fontSize: 14,
-                fontWeight: 300,
-                color: '#111111',
-                cursor: 'pointer',
-              }}
-            >
-              All
-            </span>
-            <span
-              style={{
-                fontSize: 14,
-                fontWeight: 300,
-                color: '#999999',
-              }}
-            >
-              News
-            </span>
-          </div>
 
           {/* Posts */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>

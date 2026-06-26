@@ -26,9 +26,11 @@ function columnsForWidth(): number {
 export default function CardCarousel({
   entries,
   basePath,
+  imageObjectPosition = 'center',
 }: {
   entries: CarouselEntry[];
   basePath: string;
+  imageObjectPosition?: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [cols, setCols] = useState(3);
@@ -112,7 +114,12 @@ export default function CardCarousel({
                       width={1200}
                       height={800}
                       loading="lazy"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: imageObjectPosition,
+                      }}
                     />
                   )}
                 </div>

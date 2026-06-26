@@ -6,6 +6,7 @@ import ScrollFadeIn from '@/components/public/ScrollFadeIn';
 import HeroSection, { type HeroSlideData } from '@/components/public/HeroSection';
 import FadeImage from '@/components/public/FadeImage';
 import SectionTitle from '@/components/public/SectionTitle';
+import SectionCTA from '@/components/public/SectionCTA';
 import CardCarousel, { type CarouselEntry } from '@/components/public/CardCarousel';
 import StructuredData from '@/components/StructuredData';
 import { prisma } from '@/lib/prisma';
@@ -180,6 +181,11 @@ export default async function HomePage() {
         {heroTagline}
       </p>
 
+      {/* Divider */}
+      <div style={{ maxWidth: 1280, margin: '0 auto 48px', padding: '0 40px' }}>
+        <div style={{ borderTop: '1px solid #e8e6e2' }} />
+      </div>
+
       {/* Projects Header */}
       <SectionTitle>FEATURED PROJECTS</SectionTitle>
 
@@ -256,6 +262,7 @@ export default async function HomePage() {
               );
             })}
           </div>
+          <SectionCTA href="/projects" label="More projects" />
         </section>
       )}
 
@@ -273,6 +280,7 @@ export default async function HomePage() {
             style={{ maxWidth: 1280, margin: '0 auto', padding: '0 40px 80px' }}
           >
             <CardCarousel entries={newsCarousel} basePath="/news" />
+            <SectionCTA href="/news" label="More news" />
           </section>
         </>
       )}
@@ -284,7 +292,12 @@ export default async function HomePage() {
           <section
             style={{ maxWidth: 1280, margin: '0 auto', padding: '0 40px 80px' }}
           >
-            <CardCarousel entries={journalCarousel} basePath="/journal" />
+            <CardCarousel
+              entries={journalCarousel}
+              basePath="/journal"
+              imageObjectPosition="center 20%"
+            />
+            <SectionCTA href="/journal" label="More journal entries" />
           </section>
         </>
       )}

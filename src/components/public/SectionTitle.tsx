@@ -13,7 +13,7 @@ export default function SectionTitle({ children }: { children: React.ReactNode }
     >
       <p
         style={{
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 400,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
