@@ -84,7 +84,7 @@ export default async function PracticePage() {
                           fontSize: 13,
                           fontWeight: 300,
                           lineHeight: 1.75,
-                          color: '#999999',
+                          color: '#111111',
                         }}
                         dangerouslySetInnerHTML={{ __html: block.body! }}
                       />

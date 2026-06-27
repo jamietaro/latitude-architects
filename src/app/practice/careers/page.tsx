@@ -48,7 +48,7 @@ export default async function CareersPage() {
               style={{
                 fontSize: 15,
                 fontWeight: 300,
-                color: '#999999',
+                color: '#111111',
                 lineHeight: 1.75,
                 marginBottom: 64,
               }}
