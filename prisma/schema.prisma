@@ -134,13 +134,12 @@ model AdminUser {
 }
 
 model SiteSettings {
-  id             Int         @id @default(1)
-  heroTagline    String?     @default("Celebrating 25 years of crafting exceptional buildings across London and beyond.")
-  bannerImageUrl String?
-  bannerTagline  String?     @default("Buildings for people.")
-  bannerCta      String?     @default("Get in touch")
-  updatedAt      DateTime    @updatedAt
-  heroSlides     HeroSlide[]
+  id                Int         @id @default(1)
+  heroTagline       String?     @default("Celebrating 25 years of crafting exceptional buildings across London and beyond.")
+  learnMoreWords    String?     @default("Approach,Team,Ethos,History,Office,Clients")
+  learnMoreVideoUrl String?
+  updatedAt         DateTime    @updatedAt
+  heroSlides        HeroSlide[]
 }
 
 model AboutBlock {

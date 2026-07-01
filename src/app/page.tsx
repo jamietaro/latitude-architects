@@ -9,6 +9,7 @@ import SectionTitle from '@/components/public/SectionTitle';
 import SectionCTA from '@/components/public/SectionCTA';
 import SectionDivider from '@/components/public/SectionDivider';
 import CardCarousel, { type CarouselEntry } from '@/components/public/CardCarousel';
+import LearnMoreSection from '@/components/public/LearnMoreSection';
 import StructuredData from '@/components/StructuredData';
 import { prisma } from '@/lib/prisma';
 import { FEATURED_CATEGORY } from '@/lib/categories';
@@ -119,9 +120,14 @@ export default async function HomePage() {
   const heroTagline =
     siteSettings?.heroTagline ??
     'Celebrating 25 years of crafting exceptional buildings across London and beyond.';
-  const bannerImageUrl = siteSettings?.bannerImageUrl ?? null;
-  const bannerTagline = siteSettings?.bannerTagline ?? 'Buildings for people.';
-  const bannerCta = siteSettings?.bannerCta ?? 'Get in touch';
+  const learnMoreWords = (
+    siteSettings?.learnMoreWords ??
+    'Approach,Team,Ethos,History,Office,Clients'
+  )
+    .split(',')
+    .map((w) => w.trim())
+    .filter(Boolean);
+  const learnMoreVideoUrl = siteSettings?.learnMoreVideoUrl ?? null;
 
   const toCarouselEntries = (
     rows: {
@@ -167,20 +173,48 @@ export default async function HomePage() {
 
       <HeroSection slides={heroSlides} />
 
-      {/* Hero Tagline */}
-      <p
+      {/* Hero Tagline (with large "25" behind) */}
+      <div
         style={{
-          fontSize: 22,
-          fontWeight: 300,
-          color: '#111111',
-          textAlign: 'center',
+          position: 'relative',
           maxWidth: 680,
           margin: '0 auto',
           padding: '48px 40px 32px',
         }}
       >
-        {heroTagline}
-      </p>
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontFamily: 'var(--font-jost), Futura, "Century Gothic", sans-serif',
+            fontWeight: 500,
+            fontSize: 'clamp(84px, 13vw, 150px)',
+            lineHeight: 1,
+            color: '#ececec',
+            zIndex: 0,
+            pointerEvents: 'none',
+            userSelect: 'none',
+          }}
+        >
+          25
+        </span>
+        <p
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            fontSize: 22,
+            fontWeight: 300,
+            color: '#111111',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >
+          {heroTagline}
+        </p>
+      </div>
 
       {/* Divider */}
       <SectionDivider />
@@ -303,80 +337,12 @@ export default async function HomePage() {
         </>
       )}
 
-      {/* Banner */}
-      <section
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          width: '100%',
-          height: '33vh',
-          backgroundImage: bannerImageUrl ? `url(${bannerImageUrl})` : 'none',
-          backgroundColor: bannerImageUrl ? undefined : '#1a1a1a',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 16,
-        }}
-      >
-        {/* LEGIBILITY OVERLAY — bottom gradient
-            To switch to radial vignette:
-            background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 70%)
-        */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            zIndex: 1,
-            background:
-              'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%)',
-          }}
-        />
-        <p
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            fontSize: 32,
-            fontWeight: 300,
-            color: '#ffffff',
-            letterSpacing: '0.02em',
-            margin: 0,
-            textAlign: 'center',
-            padding: '0 40px',
-          }}
-        >
-          {bannerTagline}
-        </p>
-        <Link
-          href="/contact"
-          className="banner-cta"
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            fontSize: 13,
-            fontWeight: 300,
-            color: '#ffffff',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            textDecoration: 'none',
-            paddingBottom: 2,
-            borderBottom: '1px solid transparent',
-            transition: 'border-bottom-color 0.25s ease',
-          }}
-        >
-          {bannerCta}
-        </Link>
-      </section>
+      {/* Secondary hero — video + typewriter CTA */}
+      <LearnMoreSection words={learnMoreWords} videoUrl={learnMoreVideoUrl} />
 
       <Footer />
 
       <style>{`
-        .banner-cta:hover {
-          border-bottom-color: #ffffff !important;
-        }
         .featured-link {
           transition: opacity 0.25s ease;
         }

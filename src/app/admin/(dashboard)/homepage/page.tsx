@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import ImageUpload from "@/components/admin/ImageUpload";
+import VideoUpload from "@/components/admin/VideoUpload";
 
 interface Slide {
   id?: number;
@@ -22,9 +23,17 @@ export default function HomepagePage() {
   const [heroTagline, setHeroTagline] = useState(
     "Celebrating 25 years of crafting exceptional buildings across London and beyond."
   );
-  const [bannerImageUrl, setBannerImageUrl] = useState<string | null>(null);
-  const [bannerTagline, setBannerTagline] = useState("Buildings for people.");
-  const [bannerCta, setBannerCta] = useState("Get in touch");
+  const [learnMoreWords, setLearnMoreWords] = useState<string[]>([
+    "Approach",
+    "Team",
+    "Ethos",
+    "History",
+    "Office",
+    "Clients",
+  ]);
+  const [learnMoreVideoUrl, setLearnMoreVideoUrl] = useState<string | null>(
+    null
+  );
   const [projectOptions, setProjectOptions] = useState<ProjectOption[]>([]);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
@@ -51,9 +60,13 @@ export default function HomepagePage() {
         data.heroTagline ??
           "Celebrating 25 years of crafting exceptional buildings across London and beyond."
       );
-      setBannerImageUrl(data.bannerImageUrl ?? null);
-      setBannerTagline(data.bannerTagline ?? "Buildings for people.");
-      setBannerCta(data.bannerCta ?? "Get in touch");
+      setLearnMoreWords(
+        (data.learnMoreWords ?? "Approach,Team,Ethos,History,Office,Clients")
+          .split(",")
+          .map((w: string) => w.trim())
+          .filter(Boolean)
+      );
+      setLearnMoreVideoUrl(data.learnMoreVideoUrl ?? null);
     }
 
     if (projectsRes.ok) {
@@ -83,9 +96,11 @@ export default function HomepagePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           heroTagline,
-          bannerImageUrl,
-          bannerTagline,
-          bannerCta,
+          learnMoreWords: learnMoreWords
+            .map((w) => w.trim())
+            .filter(Boolean)
+            .join(","),
+          learnMoreVideoUrl,
           heroSlides: heroSlides.map((s, idx) => ({
             imageUrl: s.imageUrl,
             opacity: s.opacity,
@@ -133,6 +148,18 @@ export default function HomepagePage() {
       [next[index], next[target]] = [next[target], next[index]];
       return next;
     });
+  }
+
+  function updateWord(index: number, value: string) {
+    setLearnMoreWords((prev) => prev.map((w, i) => (i === index ? value : w)));
+  }
+
+  function addWord() {
+    setLearnMoreWords((prev) => [...prev, ""]);
+  }
+
+  function removeWord(index: number) {
+    setLearnMoreWords((prev) => prev.filter((_, i) => i !== index));
   }
 
   if (!loaded) return null;
@@ -264,29 +291,47 @@ export default function HomepagePage() {
         </div>
 
         <div className="max-w-[480px] pt-8 border-t border-[#2a2a2e]">
-          <label className={labelClass}>Banner Image</label>
+          <label className={labelClass}>Learn More Video</label>
           <p className="text-[#666] text-xs mb-2">
-            Background image for the banner section on the homepage
+            Background video for the &ldquo;Learn more about our…&rdquo; section at
+            the foot of the homepage. The section height follows the video&rsquo;s
+            own dimensions. It autoplays (muted) when scrolled into view.
           </p>
-          <ImageUpload value={bannerImageUrl} onChange={setBannerImageUrl} />
-          <div className="mt-4">
-            <label className={labelClass}>Banner Tagline</label>
-            <input
-              type="text"
-              value={bannerTagline}
-              onChange={(e) => setBannerTagline(e.target.value)}
-              className="bg-[#28282c] border border-[#444] text-white text-sm h-11 px-3 w-full rounded outline-none focus:border-[#666] transition-colors"
-            />
-          </div>
-          <div className="mt-4">
-            <label className={labelClass}>Banner CTA Label</label>
-            <input
-              type="text"
-              value={bannerCta}
-              onChange={(e) => setBannerCta(e.target.value)}
-              className="bg-[#28282c] border border-[#444] text-white text-sm h-11 px-3 w-full rounded outline-none focus:border-[#666] transition-colors"
-            />
-            <p className="text-[#666] text-xs mt-1">Links to /contact</p>
+          <VideoUpload
+            value={learnMoreVideoUrl}
+            onChange={setLearnMoreVideoUrl}
+          />
+
+          <div className="mt-6">
+            <label className={labelClass}>Learn More Words</label>
+            <p className="text-[#666] text-xs mb-3">
+              Typed out one at a time after &ldquo;Learn more about our&rdquo;, on a
+              continuous loop.
+            </p>
+            <div className="space-y-2">
+              {learnMoreWords.map((word, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={word}
+                    onChange={(e) => updateWord(i, e.target.value)}
+                    className="bg-[#28282c] border border-[#444] text-white text-sm h-10 px-3 flex-1 rounded outline-none focus:border-[#666] transition-colors"
+                  />
+                  <button
+                    onClick={() => removeWord(i)}
+                    className="text-red-400 text-xs px-2 py-1 hover:text-red-300 cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={addWord}
+              className="mt-3 bg-[#28282c] border border-[#444] text-white text-sm px-4 py-2 rounded hover:bg-[#333] cursor-pointer"
+            >
+              + Add word
+            </button>
           </div>
         </div>
       </div>

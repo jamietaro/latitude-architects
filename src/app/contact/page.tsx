@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Nav from "@/components/public/Nav";
 import Footer from "@/components/public/Footer";
 import MapBoxLoader from "@/components/public/MapBoxLoader";
@@ -139,6 +140,26 @@ export default async function ContactPage() {
                 </svg>
               </a>
             </p>
+
+            <p
+              style={{
+                margin: "24px 0 0",
+                fontSize: 13,
+                fontWeight: 300,
+                color: "#999999",
+                lineHeight: 1.9,
+              }}
+            >
+              If you&rsquo;re interested in joining our team, visit the{" "}
+              <Link
+                href="/practice/careers"
+                className="contact-careers-link"
+                style={{ color: "#111111", textDecoration: "none" }}
+              >
+                Careers
+              </Link>{" "}
+              page.
+            </p>
           </div>
 
           {/* Right: Map */}
@@ -177,6 +198,9 @@ export default async function ContactPage() {
             margin-bottom: 0;
           }
           .contact-map-link:hover {
+            text-decoration: underline;
+          }
+          .contact-careers-link:hover {
             text-decoration: underline;
           }
           @media (max-width: 768px) {

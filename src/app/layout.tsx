@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Jost } from "next/font/google";
 import "./globals.css";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  // 700 is used only for the bold "Learn more about our…" overlay on the
+  // secondary hero, where legibility over video requires a heavier weight.
+  weight: ["300", "400", "700"],
   variable: "--font-dm-sans",
+});
+
+// Jost — a geometric sans used as a Futura-alike for the decorative "25"
+// behind the homepage tagline. Loaded here so it renders identically for
+// all visitors.
+const jost = Jost({
+  subsets: ["latin"],
+  weight: ["500"],
+  variable: "--font-jost",
 });
 
 export const metadata: Metadata = {
@@ -45,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={dmSans.className}>
+    <html lang="en" className={`${dmSans.className} ${jost.variable}`}>
       <body className="min-h-screen public-site">
         <div className="page-transition">{children}</div>
       </body>

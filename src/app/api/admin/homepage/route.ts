@@ -39,9 +39,8 @@ export async function GET() {
       id: 1,
       heroTagline:
         "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
-      bannerImageUrl: null,
-      bannerTagline: "Buildings for people.",
-      bannerCta: "Get in touch",
+      learnMoreWords: "Approach,Team,Ethos,History,Office,Clients",
+      learnMoreVideoUrl: null,
       heroSlides: [],
     }
   );
@@ -53,33 +52,27 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const {
-    heroTagline,
-    bannerImageUrl,
-    bannerTagline,
-    bannerCta,
-    heroSlides,
-  } = body;
+  const { heroTagline, learnMoreWords, learnMoreVideoUrl, heroSlides } = body;
+
+  const heroTaglineValue =
+    heroTagline ??
+    "Celebrating 25 years of crafting exceptional buildings across London and beyond.";
+  const learnMoreWordsValue =
+    learnMoreWords ?? "Approach,Team,Ethos,History,Office,Clients";
 
   // Upsert base settings (without slides)
   await prisma.siteSettings.upsert({
     where: { id: 1 },
     update: {
-      heroTagline:
-        heroTagline ??
-        "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
-      bannerImageUrl: bannerImageUrl || null,
-      bannerTagline: bannerTagline ?? "Buildings for people.",
-      bannerCta: bannerCta ?? "Get in touch",
+      heroTagline: heroTaglineValue,
+      learnMoreWords: learnMoreWordsValue,
+      learnMoreVideoUrl: learnMoreVideoUrl || null,
     },
     create: {
       id: 1,
-      bannerImageUrl: bannerImageUrl || null,
-      bannerTagline: bannerTagline ?? "Buildings for people.",
-      bannerCta: bannerCta ?? "Get in touch",
-      heroTagline:
-        heroTagline ??
-        "Celebrating 25 years of crafting exceptional buildings across London and beyond.",
+      heroTagline: heroTaglineValue,
+      learnMoreWords: learnMoreWordsValue,
+      learnMoreVideoUrl: learnMoreVideoUrl || null,
     },
   });
 

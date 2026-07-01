@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const OFFICE: [number, number] = [-0.096545, 51.501761];
+const OFFICE: [number, number] = [-0.09643, 51.50193];
 
 export default function MapBox() {
   const containerRef = useRef<HTMLDivElement | null>(null);
