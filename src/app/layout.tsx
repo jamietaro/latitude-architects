@@ -4,9 +4,7 @@ import "./globals.css";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  // 700 is used only for the bold "Learn more about our…" overlay on the
-  // secondary hero, where legibility over video requires a heavier weight.
-  weight: ["300", "400", "700"],
+  weight: ["300", "400"],
   variable: "--font-dm-sans",
 });
 

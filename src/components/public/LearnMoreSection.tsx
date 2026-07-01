@@ -5,11 +5,13 @@ import Link from "next/link";
 
 const TYPE_MS = 90;
 const DELETE_MS = 55;
-const HOLD_MS = 2000;
+const HOLD_MS = 4000;
 
 // Secondary "hero" at the foot of the homepage: a full-width video (or grey
-// placeholder until one is uploaded), with a bold, parallaxed typewriter CTA
-// that cycles the CMS word list and links to /practice.
+// placeholder until one is uploaded), with a parallaxed typewriter CTA that
+// cycles the CMS word list and links to /practice. The word sits in a
+// fixed-width slot (sized to the longest word) so the prefix never shifts and
+// the whole line stays centred.
 export default function LearnMoreSection({
   words,
   videoUrl,
@@ -25,6 +27,9 @@ export default function LearnMoreSection({
   const [display, setDisplay] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
+
+  // Reserve the width of the longest word so the line doesn't reflow as it types.
+  const longestWord = words.reduce((a, b) => (b.length > a.length ? b : a), "");
 
   useEffect(() => {
     if (words.length === 0) return;
@@ -152,11 +157,17 @@ export default function LearnMoreSection({
         <Link
           href="/practice"
           className="learn-more-cta"
-          style={{ pointerEvents: "auto", textDecoration: "none" }}
+          style={{
+            pointerEvents: "auto",
+            textDecoration: "none",
+            display: "inline-block",
+          }}
         >
           <span
+            className="learn-more-text"
             style={{
-              fontWeight: 700,
+              display: "block",
+              fontWeight: 400,
               fontSize: "clamp(22px, 4vw, 42px)",
               lineHeight: 1.2,
               color: "#ffffff",
@@ -165,10 +176,28 @@ export default function LearnMoreSection({
             }}
           >
             Learn more about our{" "}
-            <span style={{ whiteSpace: "nowrap" }}>
-              {display}
-              <span className="learn-more-caret">|</span>
+            <span className="learn-more-slot">
+              <span className="learn-more-sizer" aria-hidden="true">
+                {longestWord}.
+              </span>
+              <span className="learn-more-typed">
+                {display}
+                <span className="learn-more-dot">.</span>
+              </span>
             </span>
+          </span>
+          <span
+            className="learn-more-click"
+            style={{
+              display: "block",
+              marginTop: 16,
+              fontSize: 15,
+              fontWeight: 300,
+              color: "#ffffff",
+              textShadow: "0 1px 12px rgba(0,0,0,0.35)",
+            }}
+          >
+            Click here
           </span>
         </Link>
       </div>
@@ -176,10 +205,15 @@ export default function LearnMoreSection({
       <style>{`
         .learn-more-cta { transition: opacity 0.25s ease; }
         .learn-more-cta:hover { opacity: 0.85; }
-        .learn-more-caret {
+        .learn-more-slot {
+          position: relative;
           display: inline-block;
-          margin-left: 1px;
-          font-weight: 400;
+          text-align: left;
+          white-space: nowrap;
+        }
+        .learn-more-sizer { visibility: hidden; }
+        .learn-more-typed { position: absolute; left: 0; top: 0; }
+        .learn-more-dot {
           animation: learn-more-blink 1s step-end infinite;
         }
         @keyframes learn-more-blink {
