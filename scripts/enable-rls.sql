@@ -51,6 +51,10 @@ ALTER TABLE "AboutBlock" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "service_role_full_access" ON "AboutBlock"
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
+ALTER TABLE "AboutPageContent" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "service_role_full_access" ON "AboutPageContent"
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+
 ALTER TABLE "TeamPageContent" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "service_role_full_access" ON "TeamPageContent"
   FOR ALL TO service_role USING (true) WITH CHECK (true);

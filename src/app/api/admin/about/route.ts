@@ -9,27 +9,54 @@ interface BlockInput {
   body: string | null;
 }
 
+interface PageContentInput {
+  headline?: string | null;
+  intro?: string | null;
+  pullQuote?: string | null;
+  heroImageTop?: string | null;
+  heroImageBottom?: string | null;
+}
+
+const BLOCK_IDS = [1, 2, 3, 4, 5];
+
 export async function GET() {
   const session = await auth();
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const blocks = await prisma.aboutBlock.findMany({
-    orderBy: { id: "asc" },
-  });
+  const blocks = await prisma.aboutBlock.findMany({ orderBy: { id: "asc" } });
 
-  // Ensure all 4 rows exist — create any missing ones lazily
+  // Ensure all block rows exist — create any missing ones lazily.
   const existingIds = new Set(blocks.map((b) => b.id));
-  const missing = [1, 2, 3, 4].filter((id) => !existingIds.has(id));
+  const missing = BLOCK_IDS.filter((id) => !existingIds.has(id));
   if (missing.length > 0) {
     await prisma.aboutBlock.createMany({
-      data: missing.map((id) => ({ id, imageUrl: null, tagline: null, body: null })),
+      data: missing.map((id) => ({
+        id,
+        imageUrl: null,
+        tagline: null,
+        body: null,
+      })),
     });
-    const refreshed = await prisma.aboutBlock.findMany({ orderBy: { id: "asc" } });
-    return NextResponse.json(refreshed);
   }
 
-  return NextResponse.json(blocks);
+  const [allBlocks, pageContent] = await Promise.all([
+    prisma.aboutBlock.findMany({ orderBy: { id: "asc" } }),
+    prisma.aboutPageContent.findUnique({ where: { id: 1 } }),
+  ]);
+
+  return NextResponse.json({
+    blocks: allBlocks,
+    pageContent:
+      pageContent ?? {
+        id: 1,
+        headline: null,
+        intro: null,
+        pullQuote: null,
+        heroImageTop: null,
+        heroImageBottom: null,
+      },
+  });
 }
 
 export async function PUT(request: Request) {
@@ -39,9 +66,10 @@ export async function PUT(request: Request) {
 
   const body = await request.json();
   const blocks: BlockInput[] = Array.isArray(body.blocks) ? body.blocks : [];
+  const pc: PageContentInput = body.pageContent ?? {};
 
   for (const b of blocks) {
-    if (![1, 2, 3, 4].includes(b.id)) continue;
+    if (!BLOCK_IDS.includes(b.id)) continue;
     await prisma.aboutBlock.upsert({
       where: { id: b.id },
       update: {
@@ -58,6 +86,23 @@ export async function PUT(request: Request) {
     });
   }
 
-  const all = await prisma.aboutBlock.findMany({ orderBy: { id: "asc" } });
-  return NextResponse.json(all);
+  const pcData = {
+    headline: pc.headline || null,
+    intro: pc.intro || null,
+    pullQuote: pc.pullQuote || null,
+    heroImageTop: pc.heroImageTop || null,
+    heroImageBottom: pc.heroImageBottom || null,
+  };
+  await prisma.aboutPageContent.upsert({
+    where: { id: 1 },
+    update: pcData,
+    create: { id: 1, ...pcData },
+  });
+
+  const [allBlocks, pageContent] = await Promise.all([
+    prisma.aboutBlock.findMany({ orderBy: { id: "asc" } }),
+    prisma.aboutPageContent.findUnique({ where: { id: 1 } }),
+  ]);
+
+  return NextResponse.json({ blocks: allBlocks, pageContent });
 }

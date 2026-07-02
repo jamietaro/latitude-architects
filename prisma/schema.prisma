@@ -149,6 +149,15 @@ model AboutBlock {
   body     String?
 }
 
+model AboutPageContent {
+  id              Int     @id @default(1)
+  headline        String?
+  intro           String?
+  pullQuote       String?
+  heroImageTop    String?
+  heroImageBottom String?
+}
+
 model TeamPageContent {
   id      Int     @id @default(1)
   heading String?
